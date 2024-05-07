@@ -5,11 +5,13 @@
   "functions": {
     "predeploy": [
       "yarn workspace functions build"
-    ]
+    ],
+    "runtime": "nodejs18" 
   },
   "hosting": {
     "predeploy": "yarn workspace web build",
     "public": "web/dist",
+    "runtime": "nodejs18" ,
     "ignore": [
       "firebase.json",
       "**/.*",

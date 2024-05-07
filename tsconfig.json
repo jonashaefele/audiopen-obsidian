@@ -1,0 +1,11 @@
+{
+  "references": [
+    { "path": "./functions" },
+    { "path": "./plugin" },
+    { "path": "./shared" },
+    { "path": "./web" }
+  ],
+  "files": [],
+  "include": [],
+  "exclude": ["**/node_modules"]
+}

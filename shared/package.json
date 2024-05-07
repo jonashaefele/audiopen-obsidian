@@ -2,7 +2,7 @@
   "name": "shared",
   "version": "0.0.1",
   "devDependencies": {
-    "vite": "^2.6.4"
+    "vite": "^5.2.11"
   },
   "peerDependencies": {
     "firebase": "^9.6.11"

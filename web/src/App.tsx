@@ -1,8 +1,8 @@
-import { onCleanup, onMount, Show, useContext } from "solid-js";
-import { getDatabase, onValue, ref } from "firebase/database";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { AppContext, createAppStore } from "./store";
-import app from "shared/firebase";
+import { onCleanup, onMount, Show, useContext } from 'solid-js'
+import { getDatabase, onValue, ref } from 'firebase/database'
+import { getFunctions, httpsCallable } from 'firebase/functions'
+import { AppContext, createAppStore } from './store'
+import app from 'shared/firebase'
 import {
   Auth,
   getAuth,
@@ -10,71 +10,71 @@ import {
   signInWithPopup,
   signOut,
   User,
-} from "@firebase/auth";
+} from '@firebase/auth'
 
 const Login = () => {
-  const [store, { setLoading }] = useContext(AppContext);
-  const provider = new GoogleAuthProvider();
+  const [store, { setLoading }] = useContext(AppContext)
+  const provider = new GoogleAuthProvider()
   const loginWithGoogle = async (e: Event) => {
-    e.preventDefault();
-    setLoading(true);
-    return signInWithPopup(getAuth(store.app), provider);
-  };
+    e.preventDefault()
+    setLoading(true)
+    return signInWithPopup(getAuth(store.app), provider)
+  }
   return (
     <form onSubmit={loginWithGoogle}>
-      <button type="submit" disabled={store.loading} className="bg-primary-500">
+      <button type="submit" disabled={store.loading} class="bg-primary-500">
         Sign in with Google
       </button>
     </form>
-  );
-};
-const functions = getFunctions(app);
-const generateObsidianToken = httpsCallable(functions, "generateObsidianToken");
-const wipe = httpsCallable(functions, "wipe");
+  )
+}
+const functions = getFunctions(app)
+const generateObsidianToken = httpsCallable(functions, 'generateObsidianToken')
+const wipe = httpsCallable(functions, 'wipe')
 
 const Authed = () => {
   const [store, { setCurrentUser, setObsidianToken, setLoading }] =
-    useContext(AppContext);
+    useContext(AppContext)
 
   const handleGenerateClick = async () => {
-    setLoading(true);
+    setLoading(true)
     try {
-      const { data } = await generateObsidianToken();
-      typeof data === "string" && setObsidianToken(data);
+      const { data } = await generateObsidianToken()
+      typeof data === 'string' && setObsidianToken(data)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleLogoutClick = async (auth: Auth) => {
     try {
-      setLoading(true);
-      await signOut(auth);
-      setCurrentUser(undefined);
+      setLoading(true)
+      await signOut(auth)
+      setCurrentUser(undefined)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleClearClick = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
       // clear everything
-      await wipe({ id: -1 });
+      await wipe({ id: -1 })
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
       <section>
-        <div className="flex flex-col md:flex-row md:justify-left">
+        <div class="flex flex-col md:flex-row md:justify-left">
           {!store.obsidianToken && (
             <button
               onClick={handleGenerateClick}
               disabled={store.loading}
-              className="md:w-auto md:mr-5 bg-primary-500 border-green-600"
+              class="md:w-auto md:mr-5 bg-primary-500 border-green-600"
             >
               Generate Obsidian Signin Token
             </button>
@@ -83,14 +83,14 @@ const Authed = () => {
             onClick={() => handleClearClick()}
             disabled={store.loading}
             title="Click if plugin is erroring"
-            className="md:w-auto md:mr-5 bg-white text-gray-600 border-gray-600"
+            class="md:w-auto md:mr-5 bg-white text-gray-600 border-gray-600"
           >
             Clear Buffer ⚠️
           </button>
           <button
             onClick={() => handleLogoutClick(getAuth(store.app))}
             disabled={store.loading}
-            className="md:w-auto bg-white text-gray-600 border-gray-600"
+            class="md:w-auto bg-white text-gray-600 border-gray-600"
           >
             Logout
           </button>
@@ -109,8 +109,8 @@ const Authed = () => {
             <ul>
               <li>Use webhook url in services like IFTTT</li>
               <li>
-                Query param{" "}
-                <span className="is-family-monospace has-text-grey">path</span>{" "}
+                Query param{' '}
+                <span class="is-family-monospace has-text-grey">path</span>{' '}
                 controls which file to update
               </li>
               <li>Method type POST</li>
@@ -132,39 +132,39 @@ const Authed = () => {
         </>
       )}
     </>
-  );
-};
+  )
+}
 
 function App() {
-  const store = createAppStore();
-  const [state, { setApp, setLoading, setKey, setCurrentUser }] = store;
+  const store = createAppStore()
+  const [state, { setApp, setLoading, setKey, setCurrentUser }] = store
 
-  setApp(app);
-  const auth = getAuth(state.app);
+  setApp(app)
+  const auth = getAuth(state.app)
 
-  let keyUnsubscribe = () => {};
+  let keyUnsubscribe = () => {}
   const authUnsubscribe = auth.onAuthStateChanged((user: User | null) => {
-    keyUnsubscribe();
-    setCurrentUser(user || undefined);
+    keyUnsubscribe()
+    setCurrentUser(user || undefined)
     if (user) {
-      setLoading(true);
-      const db = getDatabase(state.app);
+      setLoading(true)
+      const db = getDatabase(state.app)
       keyUnsubscribe = onValue(ref(db, `users/${user.uid}/key`), (value) => {
-        const val = value.val();
-        setKey(val);
+        const val = value.val()
+        setKey(val)
         if (val) {
-          setLoading(false);
+          setLoading(false)
         }
-      });
+      })
     } else {
-      setLoading(false);
+      setLoading(false)
     }
-  });
+  })
 
   onCleanup(() => {
-    authUnsubscribe();
-    keyUnsubscribe();
-  });
+    authUnsubscribe()
+    keyUnsubscribe()
+  })
 
   return (
     <>
@@ -174,10 +174,10 @@ function App() {
             <h1> Obsidian Webhooks </h1>
             <h2>Connect obsidian to the internet of things via webhooks</h2>
           </hgroup>
-          <div className="mb-3">
+          <div class="mb-3">
             <a href="https://ko-fi.com/I3I72N2AC" target="_blank">
               <img
-                className="h-9 border-0"
+                class="h-9 border-0"
                 src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
                 alt="Buy Me a Coffee at ko-fi.com"
               />
@@ -196,7 +196,7 @@ function App() {
         </article>
       </main>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
