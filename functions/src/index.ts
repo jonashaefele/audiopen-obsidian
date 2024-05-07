@@ -5,45 +5,73 @@ import * as crypto from 'crypto'
 
 admin.initializeApp()
 const webhookApp = express()
-webhookApp.post('/:key', async (req: any, res: any) => {
-  const user = await (
-    await admin.database().ref(`/keys/${req.params.key}`).get()
-  ).val()
-  if (!user) {
-    return res.status(403).send('invalid key')
-  }
-  const today = new Date()
-  const exp = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate() + 7
-  )
+// Add middleware to parse JSON request body
+webhookApp.use(express.json())
 
-  let path: string
-  const qPath: unknown = req.query.path
-  if (typeof qPath === 'string') {
-    path = qPath
-  } else if (Array.isArray(qPath)) {
-    path = qPath[0]
-  } else {
-    return res
-      .status(422)
-      .send(
-        `path not a valid format. expected string recieved ${JSON.stringify(
-          qPath
-        )}`
-      )
-  }
+webhookApp.post(
+  '/:key',
+  async (req: express.Request, res: express.Response) => {
+    const user = await (
+      await admin.database().ref(`/keys/${req.params.key}`).get()
+    ).val()
+    if (!user) {
+      return res.status(403).send('Invalid key')
+    }
 
-  const buffer = {
-    id: crypto.randomBytes(16).toString('hex'),
-    path,
-    exp,
-    data: req.rawBody.toString(),
+    const today = new Date()
+    const exp = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 7
+    )
+
+    const { id, title, body, orig_transcript, tags, date_created } = req.body
+
+    let mode: string
+    const qMode: unknown = req.query.mode
+    switch (qMode) {
+      case 'update':
+        mode = 'update'
+      case 'create':
+      default:
+        mode = 'create'
+    }
+
+    // Validate the required fields and their types
+    if (
+      typeof id !== 'string' ||
+      typeof title !== 'string' ||
+      typeof body !== 'string' ||
+      typeof orig_transcript !== 'string'
+    ) {
+      return res
+        .status(400)
+        .send(
+          'Invalid field types in the request body, needs at least id, title, body and orig_transcript'
+        )
+    }
+
+    const buffer = {
+      id: crypto.randomBytes(16).toString('hex'),
+      exp,
+      data: {
+        id,
+        title,
+        body,
+        orig_transcript,
+        tags: (typeof tags === 'string' ? tags : '') // tags can be undefined
+          .split(',')
+          .map((tag) => tag.trim()),
+        date_created,
+        mode,
+      },
+    }
+    await admin.database().ref(`/buffer/${user}`).push(buffer)
+    res.send('ok')
+    return
   }
-  await admin.database().ref(`/buffer/${user}`).push(buffer)
-  res.send('ok')
-})
+)
+
 export const webhook = functions
   .region('europe-west1')
   .https.onRequest(webhookApp)
