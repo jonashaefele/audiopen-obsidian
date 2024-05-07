@@ -59,9 +59,10 @@ webhookApp.post(
         title,
         body,
         orig_transcript,
-        tags: (typeof tags === 'string' ? tags : '') // tags can be undefined
-          .split(',')
-          .map((tag) => tag.trim()),
+        tags:
+          typeof tags === 'string' // tags can be undefined
+            ? tags.split(',').map((tag) => tag.trim())
+            : [],
         date_created,
         mode,
       },
