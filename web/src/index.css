@@ -1,3 +1,135 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans h-full scroll-smooth bg-neutral antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    text-wrap: pretty;
+  }
+  h1,
+  .h1 {
+    @apply font-sans text-4xl font-bold text-primary my-4;
+    font-variation-settings: 'OPSZ' 96;
+  }
+  h2,
+  .h2 {
+    @apply font-sans text-2xl font-bold text-secondary my-3;
+  }
+  h3,
+  .h3 {
+    @apply font-sans text-xl font-medium text-secondary my-2;
+  }
+  a.link {
+    @apply font-sans text-primary font-medium hover:underline;
+  }
+}
+
+@layer components {
+  .container {
+    @apply px-6 md:px-12 mx-auto w-full max-w-4xl;
+  }
+  .container.prose {
+    @apply max-w-prose;
+  }
+  .container-double,
+  .container-full {
+    @apply container max-w-full;
+  }
+  .container-half {
+    @apply container;
+    max-width: 50%;
+  }
+  @screen md {
+    .container-double,
+    .container-double.prose,
+    .container-full,
+    .container-full.prose {
+      @apply max-w-7xl;
+    }
+  }
+
+  .button {
+    @apply px-6 py-2 bg-transparent font-medium text-primary rounded-full border-2 border-primary hover:bg-primary hover:text-primary-content disabled:opacity-30 disabled:pointer-events-none flex items-center justify-center;
+  }
+
+  .button.button-primary {
+    @apply bg-primary text-primary-content border-primary hover:bg-primary-focus hover:border-primary-focus;
+  }
+
+  .button.button-accent {
+    @apply bg-accent text-accent-content border-accent hover:border-accent-focus;
+  }
+
+  .button.button-ghost {
+    @apply bg-transparent text-neutral-content border-transparent hover:border-secondary hover:text-secondary;
+  }
+
+  .button.button-sm {
+    @apply px-2 py-1 bg-transparent text-secondary rounded text-sm;
+  }
+
+  /* customize form plugin */
+  [type='text'].form-input,
+  [type='email'].form-input,
+  [type='url'].form-input,
+  [type='password'].form-input,
+  [type='number'].form-input,
+  [type='date'].form-input,
+  [type='datetime-local'].form-input,
+  [type='month'].form-input,
+  [type='search'].form-input,
+  [type='tel'].form-input,
+  [type='time'].form-input,
+  [type='week'].form-input,
+  [multiple].form-input,
+  textarea.form-input,
+  select.form-input {
+    @apply block w-full mt-1 text-neutral-content rounded-md bg-neutral-hint opacity-80 border-2 border-neutral-focus focus:border-secondary focus:ring-0 focus:opacity-100;
+  }
+
+  [type='text'].form-input.form-input-sm,
+  [type='email'].form-input.form-input-sm,
+  [type='url'].form-input.form-input-sm,
+  [type='password'].form-input.form-input-sm,
+  [type='number'].form-input.form-input-sm,
+  [type='date'].form-input.form-input-sm,
+  [type='datetime-local'].form-input.form-input-sm,
+  [type='month'].form-input.form-input-sm,
+  [type='search'].form-input.form-input-sm,
+  [type='tel'].form-input.form-input-sm,
+  [type='time'].form-input.form-input-sm,
+  [type='week'].form-input.form-input-sm,
+  [multiple].form-input.form-input-sm,
+  textarea.form-input.form-input-sm,
+  select.form-input.form-input-sm {
+    @apply py-1 rounded text-sm;
+  }
+
+  /* https://github.com/Cosbgn/tailwindcss-tooltips */
+  .tooltip {
+    @apply invisible absolute;
+  }
+
+  .has-tooltip:hover .tooltip {
+    @apply visible z-50;
+  }
+
+  #header.scroll {
+    @apply shadow-md md:shadow-sm bg-transparent md:backdrop-blur-lg;
+    /* TODO:  @apply  bg-neutral/50  --- https://github.com/JNavith/tailwindcss-theme-variants/issues/19*/
+  }
+
+  /* .dropdown:hover .dropdown-menu {
+    display: block;
+  } */
+}

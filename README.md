@@ -1,6 +1,23 @@
-# Obsidian Webhooks
+# AudioPen - Obsidian Webhooks
 
-Obsidian plugin and service that connects your editor to the internet of things through webhooks
+Obsidian plugin and service that connects your editor to audiopen.
+This is based on the amazing work [trashhalo](https://github.com/trashhalo) did with [obsidian-webhooks](https://github.com/trashhalo/obsidian-webhooks), but updated and extended to work with AudioPen.
+
+## ToDo
+
+- [ ] test-deploy to firebase
+- [ ] change buffer to save audiopen payload
+- [ ] update plugin to create MD from audiopen JSON
+- [ ] update plugin to create/update (update if audiopenID matches title only for security purposes)
+- [ ] map tags to notes (link to notes)
+- [ ] add toggle audiopen tags to notes or tags
+- [ ] set folder in plugin settings
+- [ ] add folder support
+- [ ] add template functionality
+- [ ] update docs
+- [ ] update landing page
+- [ ] publish plugin
+- [ ] submit plugin for release
 
 ## Example Use cases
 
@@ -9,21 +26,18 @@ Obsidian plugin and service that connects your editor to the internet of things 
 - capture a note every time you react to a slack message with a pencil emoji
 - change or add notes any time you do any action on any other app
 
-## Setting up an example rule
+## Setting up the plugin
 
 1. Install the obsidian plugin from releases
-2. Go to https://obsidian-buffer.web.app to signup for the service
-3. Generate a login token and install it into the webhook plugin settings in Obsidian
-4. Use the webhook url on the service website with your favorite automation service
-5. For the spotify example usecase connect IFTTT to spotify
-6. Create an applet that connects `new saved track` event to webhooks service
-7. Paste the webhook url into the service url
-8. Change the content type to text/plain
-9. Change the method type to POST
-10. In the request body you can now type markdown to be appended to a note, be sure to use the ingredients button to reference information from the spotify event.
+2. Go to https://audiopen-obsidian.web.app to signup for the service
+3. Generate a login token and install it into the audiopen-obsidian plugin settings in Obsidian
+4. Add the webhook url to AudioPen
 
-My rule is set to append:
+- as an automatic webhook
+- (optionally) as a manual trigger, if you want to be able to update notes
 
-```markdown
-- [[{{Spotify.newSavedTrack.ArtistName}}]] [[{{Spotify.newSavedTrack.AlbumName}}]] - {{Spotify.newSavedTrack.TrackName}}
-```
+## Suport this plugin
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R5R7K2D7N)
+
+And while your at it,

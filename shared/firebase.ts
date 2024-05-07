@@ -3,14 +3,15 @@
 import { FirebaseOptions, initializeApp } from 'firebase/app'
 
 const firebaseConfig: FirebaseOptions = {
-  apiKey: 'AIzaSyD428MEhEl1Zj8TWw4MXZRsKlCXI_TCgvg',
-  authDomain: 'obsidian-buffer.firebaseapp.com',
-  databaseURL: 'wss://obsidian-buffer-default-rtdb.firebaseio.com',
-  projectId: 'obsidian-buffer',
-  storageBucket: 'obsidian-buffer.appspot.com',
-  messagingSenderId: '386398705772',
-  appId: '1:386398705772:web:4ebb36001ad006dd632049',
-  measurementId: 'G-885V9M0N0C',
+  apiKey: 'AIzaSyBN58Umn62jNrSPTSU_f7wMqBX5M1aGfZ4',
+  authDomain: 'audiopen-obsidian.firebaseapp.com',
+  databaseURL:
+    'wss://audiopen-obsidian-default-rtdb.europe-west1.firebasedatabase.app',
+  projectId: 'audiopen-obsidian',
+  storageBucket: 'audiopen-obsidian.appspot.com',
+  messagingSenderId: '548543351364',
+  appId: '1:548543351364:web:d3ed2b4e2384d242c68a11',
+  measurementId: 'G-93WY19MK85',
 }
 
 const app = initializeApp(firebaseConfig)

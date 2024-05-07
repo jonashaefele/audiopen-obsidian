@@ -22,13 +22,17 @@ const Login = () => {
   }
   return (
     <form onSubmit={loginWithGoogle}>
-      <button type="submit" disabled={store.loading} class="bg-primary-500">
+      <button
+        type="submit"
+        disabled={store.loading}
+        class="button button-primary w-full my-12"
+      >
         Sign in with Google
       </button>
     </form>
   )
 }
-const functions = getFunctions(app)
+const functions = getFunctions(app, 'europe-west1')
 const generateObsidianToken = httpsCallable(functions, 'generateObsidianToken')
 const wipe = httpsCallable(functions, 'wipe')
 
@@ -74,7 +78,7 @@ const Authed = () => {
             <button
               onClick={handleGenerateClick}
               disabled={store.loading}
-              class="md:w-auto md:mr-5 bg-primary-500 border-green-600"
+              class="md:w-auto md:mr-5 button button-primary"
             >
               Generate Obsidian Signin Token
             </button>
@@ -83,14 +87,14 @@ const Authed = () => {
             onClick={() => handleClearClick()}
             disabled={store.loading}
             title="Click if plugin is erroring"
-            class="md:w-auto md:mr-5 bg-white text-gray-600 border-gray-600"
+            class="md:w-auto md:mr-5 button"
           >
             Clear Buffer ⚠️
           </button>
           <button
             onClick={() => handleLogoutClick(getAuth(store.app))}
             disabled={store.loading}
-            class="md:w-auto bg-white text-gray-600 border-gray-600"
+            class="md:w-auto button"
           >
             Logout
           </button>
@@ -120,7 +124,8 @@ const Authed = () => {
           <input
             type="text"
             readOnly={true}
-            value={`https://us-central1-obsidian-buffer.cloudfunctions.net/webhook/${store.key}?path=test/spotify.md`}
+            class="form-input"
+            value={`https://europe-west1-audiopen-obsidian.cloudfunctions.net/webhook/${store.key}`}
           />
         </>
       )}
@@ -168,21 +173,30 @@ function App() {
 
   return (
     <>
-      <main>
+      <main class="container bg-white rounded-3xl p-12 my-8">
         <article>
           <hgroup>
-            <h1> Obsidian Webhooks </h1>
-            <h2>Connect obsidian to the internet of things via webhooks</h2>
+            <h1> AudioPen-Obsidian Webhook </h1>
+            <h2>
+              Connect{' '}
+              <a
+                href="https://audiopen.ai/?aff=x0g97"
+                target="_blank"
+                class="text-[rgb(255,92,10)] underline"
+              >
+                AudioPen
+              </a>{' '}
+              to{' '}
+              <a
+                href="https://obsidian.md/"
+                target="_blank"
+                class="text-[rgb(124,58,237)] underline"
+              >
+                Obsidian
+              </a>{' '}
+              and create at the speed of thought.
+            </h2>
           </hgroup>
-          <div class="mb-3">
-            <a href="https://ko-fi.com/I3I72N2AC" target="_blank">
-              <img
-                class="h-9 border-0"
-                src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
-                alt="Buy Me a Coffee at ko-fi.com"
-              />
-            </a>
-          </div>
           <Show when={state.loading}>
             <section>
               <div>
@@ -193,6 +207,21 @@ function App() {
           <AppContext.Provider value={store}>
             {state.currentUser ? <Authed /> : <Login />}
           </AppContext.Provider>
+
+          <div class="my-4 flex items-center">
+            If this tool is helpful to you, you can
+            <a
+              href="https://ko-fi.com/jonashaefele"
+              target="_blank"
+              class="ml-2"
+            >
+              <img
+                class="h-9 border-0"
+                src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
+                alt="Buy Me a Coffee at ko-fi.com"
+              />
+            </a>
+          </div>
         </article>
       </main>
     </>

@@ -189,12 +189,12 @@ class WebhookSettingTab extends PluginSettingTab {
 
     containerEl.empty()
 
-    containerEl.createEl('h2', { text: 'Settings for webhooks' })
+    containerEl.createEl('h2', { text: 'Settings for AudioPen-Obsidian' })
     containerEl
       .createEl('p', { text: 'Generate login tokens at ' })
       .createEl('a', {
-        text: 'Obsidian Webhooks',
-        href: 'https://obsidian-buffer.web.app',
+        text: 'AudioPen-Obsidian',
+        href: 'https://audiopen-obsidian.web.app',
       })
 
     if (this.plugin.settings.error) {
