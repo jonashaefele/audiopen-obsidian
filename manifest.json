@@ -1,9 +1,9 @@
 {
   "id": "audiopen-obsidian",
-  "name": "Audoipen Webhook Plugin",
-  "version": "0.0.6",
+  "name": "AudioPen-Obsidian Sync",
+  "version": "0.0.1",
   "minAppVersion": "0.9.12",
-  "description": "Plugin that connects your notes to audiopen through webhooks!",
+  "description": "Plugin that connects your notes to AudioPen through webhooks!",
   "author": "Jonas Haefele",
   "authorUrl": "https://audiopen-obsidian.web.app",
   "isDesktopOnly": false

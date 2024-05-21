@@ -10,5 +10,6 @@
   },
   "compileOnSave": true,
   "include": ["src"],
+  "references": [{ "path": "../shared" }],
   "exclude": ["../plugin", "../node_modules"]
 }

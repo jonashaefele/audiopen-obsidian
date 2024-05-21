@@ -5099,6 +5099,7 @@ __metadata:
     shared: "npm:^0.0.1"
     tslib: "npm:^2.6.2"
     vite: "npm:^5.2.11"
+    vite-raw-plugin: "npm:^1.0.2"
   languageName: unknown
   linkType: soft
 
@@ -6348,6 +6349,13 @@ __metadata:
     "@testing-library/jest-dom":
       optional: true
   checksum: 872a9d63d9d1ada29921de37f7420b0636ae7bc4c596072da0f098d03d932dee38b9e5f6ce88b42b4d3b19c9f06ceffcb86a335d2752784da18ca2827bf8ee56
+  languageName: node
+  linkType: hard
+
+"vite-raw-plugin@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "vite-raw-plugin@npm:1.0.2"
+  checksum: ce39694dac94b2fcd0e9b4508b4297d7f05b8b1e60716d68bbe31b1a1396d6f6f9fcde716c9bdb8a8471a27a99e2f2a3adfa89460bb765d00fd71672ccc93a10
   languageName: node
   linkType: hard
 
