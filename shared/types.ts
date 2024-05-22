@@ -12,3 +12,9 @@ export interface BufferItem {
   exp: Date
   data: BufferItemData
 }
+
+// eslint-disable-next-line no-shadow
+export enum NewLineType {
+  Windows = 1,
+  UnixMac = 2,
+}

@@ -1,23 +1,11 @@
 /* eslint-disable no-console */
 import {
-  App,
   Notice,
   Plugin,
-  PluginSettingTab,
-  Setting,
   TFile,
-  TAbstractFile,
-  TFolder,
   // addIcon,
 } from 'obsidian'
-import { MultiSuggest } from './ui/MultiSuggest'
-import {
-  Auth,
-  getAuth,
-  signInWithCustomToken,
-  signOut,
-  Unsubscribe,
-} from 'firebase/auth'
+import { getAuth, Unsubscribe } from 'firebase/auth'
 import { FirebaseApp } from 'firebase/app'
 import {
   DataSnapshot,
@@ -28,16 +16,13 @@ import {
   ref,
 } from 'firebase/database'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import app from 'shared/firebase'
-import moment from 'moment' // Import moment library
-import linksTemplate from './template-links.md'
-import tagsTemplate from './template-tags.md'
+import { default as firebaseApp } from 'shared/firebase'
+import moment from 'moment'
+import linksTemplate from './templates/template-links.md'
+import tagsTemplate from './templates/template-tags.md'
+import { BufferItemData, NewLineType } from 'shared/types'
 
-// eslint-disable-next-line no-shadow
-enum NewLineType {
-  Windows = 1,
-  UnixMac = 2,
-}
+import { AudioPenSettingTab } from './ui/SettingsTab'
 
 interface MyPluginSettings {
   token: string
@@ -78,7 +63,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
   async onload() {
     console.log('loading plugin')
     await this.loadSettings()
-    this.firebase = app
+    this.firebase = firebaseApp
     this.authUnsubscribe = getAuth(this.firebase).onAuthStateChanged((user) => {
       if (this.valUnsubscribe) {
         this.valUnsubscribe()
@@ -97,7 +82,9 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       }
     })
 
-    this.addSettingTab(new AudioPenSettingTab(this.app, this))
+    // Bind the instance of ObsidianAudioPenPlugin to the AudioPenSettingTab instance
+    const settingTab = new AudioPenSettingTab(this.app, this)
+    this.addSettingTab(settingTab)
 
     // TODO: make official AudioPen Icon work with Obsisian UI rules
     // addIcon(
@@ -143,19 +130,28 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     try {
       this.updateStatusBarIcon('sync') // Pending events, set color to orange
 
-      let last: unknown = undefined
-      let promiseChain = Promise.resolve()
+      const payloads: BufferItemData[] = []
       data.forEach((event) => {
         const payload = event.val().data // Get the payload data
-        if (!payload) {
-          return
-          //TODO: eror handling
+        if (payload) {
+          payloads.push(payload)
         }
-        last = payload
-        promiseChain = promiseChain.then(() => this.applyEvent(payload))
       })
+
+      // Sort payloads by date_created in ascending order
+      payloads.sort((a, b) => {
+        const dateA = new Date(a.date_created)
+        const dateB = new Date(b.date_created)
+        return dateA.getTime() - dateB.getTime()
+      })
+
+      let promiseChain = Promise.resolve()
+      for (const payload of payloads) {
+        promiseChain = promiseChain.then(() => this.applyEvent(payload))
+      }
+
       await promiseChain
-      await this.wipe(last)
+      await this.wipe(payloads[payloads.length - 1]) // Wipe the last (newest) payload
       promiseChain.catch((err) => {
         this.handleError(err, 'Error processing webhook events')
       })
@@ -382,275 +378,10 @@ export default class ObsidianAudioPenPlugin extends Plugin {
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
+    console.log('settings in plugin after load', this.settings)
   }
 
   async saveSettings() {
     await this.saveData(this.settings)
-  }
-}
-
-class AudioPenSettingTab extends PluginSettingTab {
-  plugin: ObsidianAudioPenPlugin
-  auth: Auth
-  authObserver: Unsubscribe
-
-  constructor(oApp: App, plugin: ObsidianAudioPenPlugin) {
-    super(oApp, plugin)
-    this.plugin = plugin
-    this.auth = getAuth(this.plugin.firebase)
-    this.authObserver = this.auth.onAuthStateChanged(this.display.bind(this))
-  }
-
-  hide(): void {
-    this.authObserver()
-  }
-
-  display(): void {
-    if (!this) {
-      return
-    }
-
-    let { containerEl } = this
-
-    containerEl.empty()
-
-    containerEl.createEl('h2', { text: 'Settings for AudioPen-Obsidian' })
-    containerEl
-      .createEl('p', { text: 'Generate login tokens at ' })
-      .createEl('a', {
-        text: 'AudioPen-Obsidian',
-        href: 'https://audiopen-obsidian.web.app',
-      })
-
-    if (this.plugin.settings.error) {
-      containerEl.createEl('p', {
-        text: `error: ${this.plugin.settings.error}`,
-      })
-    }
-
-    if (this.auth.currentUser) {
-      new Setting(containerEl)
-        .setName(`logged in as ${this.auth.currentUser.email}`)
-        .addButton((button) => {
-          button
-            .setButtonText('Logout')
-            .setCta()
-            .onClick(async (evt) => {
-              try {
-                await signOut(this.auth)
-                this.plugin.settings.error = undefined
-              } catch (err) {
-                this.plugin.settings.error = err.message
-              } finally {
-                await this.plugin.saveSettings()
-                this.display()
-              }
-            })
-        })
-
-      new Setting(containerEl)
-        .setName('Destination Folder')
-        .setDesc('Select the folder where new notes will be created')
-        .addText((text) => {
-          const inputEl = text.inputEl
-          const getContent = () => {
-            const rootFolder = this.app.vault.getAbstractFileByPath('/')
-            const folderOptions = this.getFolderOptions(rootFolder)
-            return new Set(folderOptions)
-          }
-          const onSelectCb = async (value: string) => {
-            this.plugin.settings.folderPath = value
-            await this.plugin.saveSettings()
-            this.display()
-          }
-          const multiSuggest = new MultiSuggest(
-            inputEl,
-            getContent,
-            this.app,
-            onSelectCb
-          )
-          inputEl.addEventListener('input', () => multiSuggest.open())
-          inputEl.addEventListener('focus', () => multiSuggest.open())
-          inputEl.value = this.plugin.settings.folderPath || ''
-        })
-
-      new Setting(containerEl)
-        .setName('Update Mode')
-        .setDesc(
-          'How to handle existing files when receiving updates to an existing AudioPen note (identified by AudioPen ID). Append and prepend will only insert the new/edited summary.'
-        )
-        .addDropdown((dropdown) => {
-          dropdown
-            .addOption('overwrite', 'Overwrite existing file')
-            .addOption('append', 'Append (note only) to existing file')
-            .addOption('prepend', 'Prepend (note only) to existing file')
-            .addOption('new', 'Always create a new file')
-            .setValue(this.plugin.settings.updateMode || 'new')
-            .onChange(async (value) => {
-              // @ts-ignore
-              this.plugin.settings.updateMode = value
-              await this.plugin.saveSettings()
-              this.display()
-            })
-        })
-
-      new Setting(containerEl)
-        .setName('New Line')
-        .setDesc(
-          'When appending/prepending, should we add new lines between the existing content and the new content?'
-        )
-        .addDropdown((dropdown) => {
-          dropdown.addOption('none', 'No new lines')
-          dropdown.addOption('windows', 'Windows style newlines')
-          dropdown.addOption('unixMac', 'Linux, Unix or Mac style new lines')
-          const { newLineType } = this.plugin.settings
-          if (newLineType === undefined) {
-            dropdown.setValue('none')
-          } else if (newLineType == NewLineType.Windows) {
-            dropdown.setValue('windows')
-          } else if (newLineType == NewLineType.UnixMac) {
-            dropdown.setValue('unixMac')
-          }
-          dropdown.onChange(async (value) => {
-            if (value == 'none') {
-              this.plugin.settings.newLineType = undefined
-            } else if (value == 'windows') {
-              this.plugin.settings.newLineType = NewLineType.Windows
-            } else if (value == 'unixMac') {
-              this.plugin.settings.newLineType = NewLineType.UnixMac
-            }
-            await this.plugin.saveSettings()
-            this.display()
-          })
-        })
-
-      if (!this.plugin.settings.useCustomTemplate) {
-        new Setting(containerEl)
-          .setName('Render Tags As')
-          .setDesc('How should we render AudioPen tags?')
-          .addDropdown((dropdown) => {
-            dropdown
-              .addOption('links', '[[Links]] to notes')
-              .addOption('tags', 'Simple #tags')
-              .setValue(this.plugin.settings.tagsAsLinks ? 'links' : 'tags')
-              .onChange(async (value) => {
-                this.plugin.settings.tagsAsLinks = value === 'links'
-                await this.plugin.saveSettings()
-                this.display()
-              })
-          })
-
-        if (this.plugin.settings.tagsAsLinks) {
-          new Setting(containerEl)
-            .setName('Link Property')
-            .setDesc(
-              "Frontmatter property for tags as links (e.g., 'x', 'links')"
-            )
-            .addText((text) => {
-              text
-                .setPlaceholder('x')
-                .setValue(this.plugin.settings.linkProperty || 'x')
-                .onChange(async (value) => {
-                  this.plugin.settings.linkProperty = value
-                  await this.plugin.saveSettings()
-                  this.display()
-                })
-            })
-        }
-      }
-      new Setting(containerEl)
-        .setName('Use Custom Template')
-        .setDesc(
-          'Toggle between using the default template or a custom template'
-        )
-        .addToggle((toggle) =>
-          toggle
-            .setValue(this.plugin.settings.useCustomTemplate)
-            .onChange(async (value) => {
-              this.plugin.settings.useCustomTemplate = value
-              await this.plugin.saveSettings()
-              this.display()
-            })
-        )
-
-      if (this.plugin.settings.useCustomTemplate) {
-        new Setting(containerEl)
-          .setName('Custom Template')
-          .setDesc(
-            'Select a Markdown file from your vault to use as a custom template'
-          )
-          .addText((text) => {
-            const inputEl = text.inputEl
-            const getContent = () => {
-              const markdownFiles = this.app.vault.getMarkdownFiles()
-              return new Set(markdownFiles.map((file) => file.path))
-            }
-            const onSelectCb = async (value: string) => {
-              this.plugin.settings.markdownTemplate = value
-              await this.plugin.saveSettings()
-              this.display()
-            }
-            const multiSuggest = new MultiSuggest(
-              inputEl,
-              getContent,
-              this.app,
-              onSelectCb
-            )
-            inputEl.addEventListener('input', () => multiSuggest.open())
-            inputEl.addEventListener('focus', () => multiSuggest.open())
-            inputEl.value = this.plugin.settings.markdownTemplate || ''
-          })
-      }
-
-      return
-    }
-
-    new Setting(containerEl).setName('Webhook login token').addText((text) =>
-      text
-        .setPlaceholder('Paste your token')
-        .setValue(this.plugin.settings.token)
-        .onChange(async (value) => {
-          console.log('Secret: ' + value)
-          this.plugin.settings.token = value
-          await this.plugin.saveSettings()
-        })
-    )
-
-    new Setting(containerEl)
-      .setName('Login')
-      .setDesc('Exchanges webhook token for authentication')
-      .addButton((button) => {
-        button
-          .setButtonText('Login')
-          .setCta()
-          .onClick(async (evt) => {
-            try {
-              await signInWithCustomToken(this.auth, this.plugin.settings.token)
-              this.plugin.settings.token = ''
-              this.plugin.settings.error = undefined
-            } catch (err) {
-              this.plugin.settings.error = err.message
-            } finally {
-              await this.plugin.saveSettings()
-              this.display()
-            }
-          })
-      })
-  }
-
-  getFolderOptions(folder: TAbstractFile): string[] {
-    const options: string[] = []
-
-    if (folder instanceof TFolder) {
-      options.push(folder.path)
-
-      folder.children.forEach((child) => {
-        if (child instanceof TFolder) {
-          options.push(...this.getFolderOptions(child))
-        }
-      })
-    }
-
-    return options
   }
 }

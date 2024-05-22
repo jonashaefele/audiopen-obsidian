@@ -5,19 +5,20 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 
 ## ToDo
 
-- [ ] test-deploy to firebase
-- [ ] change buffer to save audiopen payload
-- [ ] update plugin to create MD from audiopen JSON
-- [ ] update plugin to create/update (update if audiopenID matches title only for security purposes)
-- [ ] map tags to notes (link to notes)
-- [ ] add toggle audiopen tags to notes or tags
-- [ ] set folder in plugin settings
-- [ ] add folder support
-- [ ] add template functionality
+- [x] test-deploy to firebase
+- [x] change buffer to save audiopen payload
+- [x] update plugin to create MD from audiopen JSON
+- [x] update plugin to create/update (update if audiopenID matches title only for security purposes)
+- [x] map tags to notes (link to notes)
+- [x] add toggle audiopen tags to notes or tags
+- [x] set folder in plugin settings
+- [?] add folder support
+- [x] add template functionality
 - [ ] update docs
 - [ ] update landing page
 - [ ] publish plugin
 - [ ] submit plugin for release
+- [ ] update wipe and buffer functionality on website
 
 ## Example Use cases
 

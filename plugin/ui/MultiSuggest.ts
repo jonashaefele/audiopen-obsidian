@@ -1,5 +1,9 @@
 import { AbstractInputSuggest, App } from 'obsidian'
 
+// not documented well, but found here:
+// https://forum.obsidian.md/t/provide-an-implementation-of-suggest-input-for-plugins-to-use/66561/6
+// https://github.com/obsidianmd/obsidian-api/blob/249eb773347588f4e9fec7c600e1904cd9240fcb/obsidian.d.ts#L290
+
 export class MultiSuggest extends AbstractInputSuggest<string> {
   private content: Set<string>
   private onSelectCb: (value: string) => void
