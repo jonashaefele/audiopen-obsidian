@@ -112,7 +112,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
         })
 
       new Setting(containerEl)
-        .setName('Destination Folder')
+        .setName('Destination folder')
         .setDesc('Select the folder where new notes will be created')
         .addText((text) => {
           const inputEl = text.inputEl
@@ -138,7 +138,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
         })
 
       new Setting(containerEl)
-        .setName('Update Mode')
+        .setName('Update mode')
         .setDesc(
           'How to handle existing files when receiving updates to an existing AudioPen note (identified by AudioPen ID). Append and prepend will only insert the new/edited summary.'
         )
@@ -158,7 +158,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
         })
 
       new Setting(containerEl)
-        .setName('New Line')
+        .setName('New line')
         .setDesc(
           'When appending/prepending, should we add new lines between the existing content and the new content?'
         )
@@ -189,7 +189,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
 
       if (!this.plugin.settings.useCustomTemplate) {
         new Setting(containerEl)
-          .setName('Render Tags As')
+          .setName('Render tags as')
           .setDesc('How should we render AudioPen tags?')
           .addDropdown((dropdown) => {
             dropdown
@@ -205,7 +205,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
 
         if (this.plugin.settings.tagsAsLinks) {
           new Setting(containerEl)
-            .setName('Link Property')
+            .setName('Link property')
             .setDesc(
               "Frontmatter property for tags as links (e.g., 'x', 'links')"
             )
@@ -222,13 +222,13 @@ export class AudioPenSettingTab extends PluginSettingTab {
         }
       }
 
-      containerEl.createEl('h2', { text: 'Advanced Settings' })
+      containerEl.createEl('h2', { text: 'Advanced settings' })
       containerEl.createEl('p', {
         text: 'You can use custom templates to render your notes and make them yours. If you break the template, you may lose data from the buffer.',
       })
 
       new Setting(containerEl)
-        .setName('Use Custom Template')
+        .setName('Use custom template')
         .setDesc(
           'Toggle between using the default template or a custom template'
         )
@@ -243,8 +243,16 @@ export class AudioPenSettingTab extends PluginSettingTab {
         )
 
       if (this.plugin.settings.useCustomTemplate) {
+        containerEl.createEl('p', {
+          text: 'You can use the following variables in your template: {title}, {body}, {orig_transcript}, {id}, {date_created},{date_formatted}, {tagsAsLinks}, {tagsAsTags}',
+        })
+        containerEl.createEl('a', {
+          text: 'Check the README for more information',
+          href: 'https://github.com/jonashaefele/audiopen-obsidian#custom-templates',
+        })
+
         new Setting(containerEl)
-          .setName('Custom Template')
+          .setName('Custom template')
           .setDesc(
             'Select a Markdown file from your vault to use as a custom template'
           )
