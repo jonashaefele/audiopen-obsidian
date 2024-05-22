@@ -22,34 +22,11 @@ import linksTemplate from './templates/template-links.md'
 import tagsTemplate from './templates/template-tags.md'
 import { BufferItemData, NewLineType } from 'shared/types'
 
-import { AudioPenSettingTab } from './ui/SettingsTab'
-
-interface MyPluginSettings {
-  token: string
-  frequency: string
-  triggerOnLoad: boolean
-  error?: string
-  newLineType?: NewLineType
-  tagsAsLinks?: boolean
-  linkProperty?: string
-  markdownTemplate?: string
-  folderPath: string
-  updateMode?: 'overwrite' | 'append' | 'prepend' | 'new'
-  useCustomTemplate: boolean
-}
-
-const DEFAULT_SETTINGS: MyPluginSettings = {
-  token: '',
-  frequency: '0', // manual by default
-  triggerOnLoad: true,
-  newLineType: undefined,
-  tagsAsLinks: true, // Default to rendering tags as links
-  linkProperty: 'x', // Default link property
-  markdownTemplate: '',
-  folderPath: '',
-  updateMode: 'new',
-  useCustomTemplate: false,
-}
+import {
+  MyPluginSettings,
+  DEFAULT_SETTINGS,
+  AudioPenSettingTab,
+} from './ui/SettingsTab'
 
 export default class ObsidianAudioPenPlugin extends Plugin {
   settings: MyPluginSettings
@@ -61,7 +38,6 @@ export default class ObsidianAudioPenPlugin extends Plugin {
   defaultTemplate: string
 
   async onload() {
-    console.log('loading plugin')
     await this.loadSettings()
     this.firebase = firebaseApp
     this.authUnsubscribe = getAuth(this.firebase).onAuthStateChanged((user) => {
@@ -245,8 +221,6 @@ export default class ObsidianAudioPenPlugin extends Plugin {
             .join('\n')
         : ''
 
-    console.log('making md', title, body, tagsAsLinks, markdownTemplate)
-
     return markdownTemplate
       .replace(/{title}/g, title)
       .replace(/{body}/g, body)
@@ -299,8 +273,6 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       await this.app.vault.create(filePath, newContent)
       return
     }
-
-    console.log('action: ', this.settings.updateMode)
 
     if (this.settings.updateMode === 'new') {
       // Create a new file with a "V" suffix
@@ -357,8 +329,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
   generateFilePath(title: string): string {
     // Implement the logic to generate the file path based on the title
     // and the user's folder preference
-    console.log('generating file path', title)
-    const folderPath = this.settings.folderPath || '+ Inbox/AudioPen/Test'
+    const folderPath = this.settings.folderPath || '+ Inbox/AudioPen'
     const fileName = title
       .replace(/[\\/:*?'"<>.|]/g, '') // Remove reserved characters for file names
       .slice(0, 250) // Limit the file name to 250 characters
@@ -367,7 +338,6 @@ export default class ObsidianAudioPenPlugin extends Plugin {
   }
 
   onunload() {
-    console.log('unloading plugin')
     if (this.authUnsubscribe) {
       this.authUnsubscribe()
     }
@@ -378,7 +348,6 @@ export default class ObsidianAudioPenPlugin extends Plugin {
 
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData())
-    console.log('settings in plugin after load', this.settings)
   }
 
   async saveSettings() {

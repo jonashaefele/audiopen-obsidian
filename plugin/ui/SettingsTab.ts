@@ -7,6 +7,7 @@ import {
   TFolder,
 } from 'obsidian'
 import { MultiSuggest } from './MultiSuggest'
+import { withConfirm } from './button'
 import ObsidianAudioPenPlugin from '../main'
 import {
   Auth,
@@ -16,6 +17,33 @@ import {
   Unsubscribe,
 } from 'firebase/auth'
 import { NewLineType } from 'shared/types'
+
+export interface MyPluginSettings {
+  token: string
+  frequency: string
+  triggerOnLoad: boolean
+  error?: string
+  newLineType?: NewLineType
+  tagsAsLinks?: boolean
+  linkProperty?: string
+  markdownTemplate?: string
+  folderPath: string
+  updateMode?: 'overwrite' | 'append' | 'prepend' | 'new'
+  useCustomTemplate: boolean
+}
+
+export const DEFAULT_SETTINGS: MyPluginSettings = {
+  token: '',
+  frequency: '0', // manual by default
+  triggerOnLoad: true,
+  newLineType: undefined,
+  tagsAsLinks: true, // Default to rendering tags as links
+  linkProperty: 'x', // Default link property
+  markdownTemplate: '',
+  folderPath: '',
+  updateMode: 'new',
+  useCustomTemplate: false,
+}
 
 export class AudioPenSettingTab extends PluginSettingTab {
   plugin: ObsidianAudioPenPlugin
@@ -46,13 +74,8 @@ export class AudioPenSettingTab extends PluginSettingTab {
 
     containerEl.empty()
 
+    // General Settings - Header
     containerEl.createEl('h2', { text: 'Settings for AudioPen-Obsidian' })
-    containerEl
-      .createEl('p', { text: 'Generate login tokens at ' })
-      .createEl('a', {
-        text: 'AudioPen-Obsidian',
-        href: 'https://audiopen-obsidian.web.app',
-      })
 
     if (this.plugin.settings.error) {
       containerEl.createEl('p', {
@@ -60,7 +83,15 @@ export class AudioPenSettingTab extends PluginSettingTab {
       })
     }
 
+    // Settings for Logged-In Users
     if (this.auth.currentUser) {
+      containerEl
+        .createEl('p', { text: 'See your buffer and read the docs at ' })
+        .createEl('a', {
+          text: 'AudioPen-Obsidian',
+          href: 'https://audiopen-obsidian.web.app',
+        })
+
       new Setting(containerEl)
         .setName(`logged in as ${this.auth.currentUser.email}`)
         .addButton((button) => {
@@ -190,6 +221,12 @@ export class AudioPenSettingTab extends PluginSettingTab {
             })
         }
       }
+
+      containerEl.createEl('h2', { text: 'Advanced Settings' })
+      containerEl.createEl('p', {
+        text: 'You can use custom templates to render your notes and make them yours. If you break the template, you may lose data from the buffer.',
+      })
+
       new Setting(containerEl)
         .setName('Use Custom Template')
         .setDesc(
@@ -234,40 +271,110 @@ export class AudioPenSettingTab extends PluginSettingTab {
           })
       }
 
-      return
-    }
-
-    new Setting(containerEl).setName('Webhook login token').addText((text) =>
-      text
-        .setPlaceholder('Paste your token')
-        .setValue(this.plugin.settings.token)
-        .onChange(async (value) => {
-          console.log('Secret: ' + value)
-          this.plugin.settings.token = value
-          await this.plugin.saveSettings()
-        })
-    )
-
-    new Setting(containerEl)
-      .setName('Login')
-      .setDesc('Exchanges webhook token for authentication')
-      .addButton((button) => {
-        button
-          .setButtonText('Login')
-          .setCta()
-          .onClick(async (evt) => {
-            try {
-              await signInWithCustomToken(this.auth, this.plugin.settings.token)
-              this.plugin.settings.token = ''
-              this.plugin.settings.error = undefined
-            } catch (err) {
-              this.plugin.settings.error = err.message
-            } finally {
-              await this.plugin.saveSettings()
-              this.display()
-            }
+      containerEl.createEl('h2', { text: 'Danger Zone' })
+      new Setting(containerEl)
+        .setName(`Reset all settings to defaults.`)
+        .addButton(
+          withConfirm((button) => {
+            button
+              .setButtonText('Reset Settings')
+              .setCta()
+              .onClick(async (evt) => {
+                try {
+                  await signOut(this.auth)
+                  this.plugin.settings = DEFAULT_SETTINGS
+                } catch (err) {
+                  this.plugin.settings.error = err.message
+                } finally {
+                  await this.plugin.saveSettings()
+                  this.display()
+                }
+              })
           })
-      })
+        )
+    } // end this.auth.currentuser - logged
+    else {
+      // Settings for Logged-Out Users (need to log in)
+      containerEl
+        .createEl('p', { text: 'Generate a login token at ' })
+        .createEl('a', {
+          text: 'AudioPen-Obsidian',
+          href: 'https://audiopen-obsidian.web.app',
+        })
+
+      new Setting(containerEl).setName('Webhook login token').addText((text) =>
+        text
+          .setPlaceholder('Paste your token')
+          .setValue(this.plugin.settings.token)
+          .onChange(async (value) => {
+            console.log('Secret: ' + value)
+            this.plugin.settings.token = value
+            await this.plugin.saveSettings()
+          })
+      )
+
+      new Setting(containerEl)
+        .setName('Login')
+        .setDesc('Exchanges webhook token for authentication')
+        .addButton((button) => {
+          button
+            .setButtonText('Login')
+            .setCta()
+            .onClick(async (evt) => {
+              try {
+                await signInWithCustomToken(
+                  this.auth,
+                  this.plugin.settings.token
+                )
+                this.plugin.settings.token = ''
+                this.plugin.settings.error = undefined
+              } catch (err) {
+                this.plugin.settings.error = err.message
+              } finally {
+                await this.plugin.saveSettings()
+                this.display()
+              }
+            })
+        })
+    } // end logged-out
+
+    containerEl.createEl('h2', { text: 'Support' })
+    containerEl.createEl('p', {
+      text: 'If you like this plugin and get value form it, consider donating to support continued development and to help cover server costs.',
+    })
+    const donateKoFi = new Setting(this.containerEl)
+      .setName('Buy me a Coffee')
+      .setDesc('One-off or recurring donations are welcome. Thank you!')
+
+    const kofi = document.createElement('a')
+    kofi.setAttribute('href', 'https://ko-fi.com/jonashaefele')
+    const kofiImg = document.createElement('img')
+    kofiImg.src = 'https://storage.ko-fi.com/cdn/kofi3.png?v=3'
+    kofiImg.height = 36
+    kofiImg.setAttribute(
+      'style',
+      'border:0px; height:36px; border-radius: 18px;'
+    )
+    kofiImg.alt = 'Buy Me a Coffee at ko-fi.com'
+    kofi.appendChild(kofiImg)
+
+    donateKoFi.controlEl.appendChild(kofi)
+
+    const donateGH = new Setting(this.containerEl)
+      .setName('Become a Github Sponsor')
+      .setDesc('For the fellow developers out there. Thank you!')
+
+    const ghSponsor = document.createElement('iframe')
+    ghSponsor.setAttribute(
+      'src',
+      'https://github.com/sponsors/jonashaefele/button'
+    )
+    ghSponsor.setAttribute('title', 'Sponsor jonashaefele')
+    ghSponsor.setAttribute('height', '32')
+    ghSponsor.setAttribute('width', '114')
+    ghSponsor.setAttribute('style', 'border: 0; border-radius: 6px;')
+
+    donateGH.controlEl.appendChild(ghSponsor)
   }
 
   getFolderOptions(folder: TAbstractFile): string[] {

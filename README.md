@@ -41,4 +41,5 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R5R7K2D7N)
 
-And while your at it,
+And while your at it, you might be interested in some of the other things I think about and create.
+You can find my work [slow.works](https://slow.works) oand read about my thoughts on [Substack](https://slowworks.substack.com/)
