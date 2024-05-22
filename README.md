@@ -36,8 +36,8 @@ You can create custom templates for your notes by creating a `audiopen-template.
 
 ### 1. Choose a starting point for your template:
 
-- [Template with AudioPen tags as Obsidian Links](plugin/templates/template-links.md)
-- [Template with AudioPen tags as Obsidian tags](plugin/templates/template-tags.md)
+- [Template with AudioPen tags as Obsidian Links](plugin/templates/template-links.md?plain=1)
+- [Template with AudioPen tags as Obsidian tags](plugin/templates/template-tags.md?plain=1)
 
 ### 2. Save it to your Vault's template folder
 
