@@ -73,24 +73,12 @@ const Authed = () => {
   return (
     <>
       <section>
-        <div class="flex flex-col md:flex-row md:justify-left">
-          {!store.obsidianToken && (
-            <button
-              onClick={handleGenerateClick}
-              disabled={store.loading}
-              class="md:w-auto md:mr-5 button button-primary"
-            >
-              Generate Obsidian Signin Token
-            </button>
-          )}
-          <button
-            onClick={() => handleClearClick()}
-            disabled={store.loading}
-            title="Click if plugin is erroring"
-            class="md:w-auto md:mr-5 button"
-          >
-            Clear Buffer ⚠️
-          </button>
+        <div class="flex flex-col md:flex-row md:justify-between items-center bg-neutral-shade p-4 rounded-3xl my-8">
+          <p>
+            You're signed in as{' '}
+            <strong>{store.currentUser?.displayName}</strong> (
+            {store.currentUser?.email})
+          </p>
           <button
             onClick={() => handleLogoutClick(getAuth(store.app))}
             disabled={store.loading}
@@ -99,26 +87,50 @@ const Authed = () => {
             Logout
           </button>
         </div>
+
+        <div class="flex flex-col md:flex-row md:justify-left">
+          {!store.obsidianToken && (
+            <button
+              onClick={handleGenerateClick}
+              disabled={store.loading}
+              class="md:w-auto md:mr-5 button button-primary"
+            >
+              Generate Obsidian Login Token
+            </button>
+          )}
+        </div>
         {store.obsidianToken && (
           <>
-            <p>Copy token and paste into plugin settings</p>
-            <input type="text" readOnly={true} value={store.obsidianToken} />
+            <h3 class="mt-8">Obsidian login token</h3>
+            <p>
+              Copy token and paste into the{' '}
+              <strong>AudioPen-Obsidian Sync</strong> plugin settings:
+            </p>
+            <input
+              type="text"
+              class="form-input w-full"
+              readOnly={true}
+              value={store.obsidianToken}
+            />
           </>
         )}
       </section>
       {store.key && (
         <>
-          <h3> Webhook URL </h3>
-          <div>
+          <h3 class="mt-8"> Webhook URL </h3>
+          <div class="mb-4">
             <ul>
-              <li>Use webhook url in services like IFTTT</li>
+              <li>Use this URL as your AudioPen webhook.</li>
               <li>
-                Query param{' '}
-                <span class="is-family-monospace has-text-grey">path</span>{' '}
-                controls which file to update
+                Step by step instructions are in the{' '}
+                <a
+                  href="https://github.com/jonashaefele/audiopen-obsidian?tab=readme-ov-file#4-how-to-add-the-webhook-to-audiopen"
+                  target="_blank"
+                  class="link"
+                >
+                  README on GitHub
+                </a>
               </li>
-              <li>Method type POST</li>
-              <li>Body is the markdown to insert into the file</li>
             </ul>
           </div>
           <input
@@ -131,6 +143,14 @@ const Authed = () => {
       )}
       {store.buffer && (
         <>
+          <button
+            onClick={() => handleClearClick()}
+            disabled={store.loading}
+            title="Click if plugin is erroring"
+            class="md:w-auto md:mr-5 button"
+          >
+            Clear Buffer ⚠️
+          </button>
           {store.buffer.map((v) => (
             <div>{JSON.stringify(v.val)}</div>
           ))}
@@ -174,7 +194,7 @@ function App() {
   return (
     <>
       <main class="container bg-white rounded-3xl p-12 my-8">
-        <article>
+        <section>
           <hgroup>
             <h1> AudioPen-Obsidian Webhook </h1>
             <h2>
@@ -208,21 +228,49 @@ function App() {
             {state.currentUser ? <Authed /> : <Login />}
           </AppContext.Provider>
 
-          <div class="my-4 flex items-center">
-            If this tool is helpful to you, you can
-            <a
-              href="https://ko-fi.com/jonashaefele"
-              target="_blank"
-              class="ml-2"
-            >
-              <img
-                class="h-9 border-0"
-                src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
-                alt="Buy Me a Coffee at ko-fi.com"
-              />
-            </a>
-          </div>
-        </article>
+          <article class="mt-8">
+            <h3 class="mt-8">Support this project</h3>
+            <p>
+              This service and plugin is a passion project and an experiement in
+              how we can use technology in a more humane and embodied way. I
+              offer it for free as long as I can. Any help in covering server
+              costs and continued development is appreciated, but not expected.
+            </p>
+            <div class="my-4 flex flex-row items-center">
+              <span>If this tool is helpful to you, you can</span>
+              <a
+                href="https://ko-fi.com/jonashaefele"
+                target="_blank"
+                class="ml-2"
+              >
+                <img
+                  class="h-9 border-0"
+                  src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
+                  alt="Buy Me a Coffee at ko-fi.com"
+                />
+              </a>
+              <span class="inline-block mx-4">or sponsor me on GitHub</span>
+              <iframe
+                src="https://github.com/sponsors/jonashaefele/button"
+                title="Sponsor jonashaefele"
+                height="32"
+                width="114"
+                style="border: 0; border-radius: 6px;"
+              ></iframe>
+            </div>
+            <p>
+              And while you're at it, you might be interested in some of the
+              other things I think about and create. You can find my work{' '}
+              <a class="link" href="https://slow.works">
+                slow.works
+              </a>{' '}
+              and read about my thoughts on{' '}
+              <a class="link" href="https://slowworks.substack.com/">
+                Substack
+              </a>
+            </p>
+          </article>
+        </section>
       </main>
     </>
   )

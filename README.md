@@ -1,6 +1,6 @@
-# AudioPen - Obsidian Webhooks
+# AudioPen - Obsidian Sync
 
-Obsidian plugin and service that connects your editor to [AudioPen](https://audiopen.ai/?aff=x0g97).
+[Obsidian](https://obsidian.md/) plugin and service that connects your editor to [AudioPen](https://audiopen.ai/?aff=x0g97).
 
 This is based on the amazing work [trashhalo](https://github.com/trashhalo) did with [obsidian-webhooks](https://github.com/trashhalo/obsidian-webhooks), but updated and extended to work with AudioPen.
 
@@ -22,16 +22,17 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 
 ## Setting up the plugin
 
-1. Install the obsidian plugin from releases
+1. Install the obsidian plugin from releases (https://github.com/jonashaefele/audiopen-obsidian/releases)
 2. Go to https://audiopen-obsidian.web.app to signup for the service
-3. Generate a login token and install it into the audiopen-obsidian plugin settings in Obsidian
-4. Add the webhook url to AudioPen
+3. Generate a login token
+4. Used the token to log in the `Audiopen-Obsidian Sync` plugin settings in Obsidian
+5. Add the webhook url to AudioPen
 
 For detailed instructions, read on:
 
-### 4. How to add the webhook to AudioPen
+### 5. How to add the webhook to AudioPen
 
-After you did 1-3 above, you'll have a webhook url and a token.
+After you did 1-4 above, you'll have a webhook url and a token.
 
 The webhook URL looks like this: `https://europe-west1-audiopen-obsidian.cloudfunctions.net/webhook/ab97f2f036a143f5d3555e5fc3f4e833`
 
@@ -50,7 +51,7 @@ The webhook URL looks like this: `https://europe-west1-audiopen-obsidian.cloudfu
 
 ## Custom Templates
 
-You can create custom templates for your notes by creating a `audiopen-template.md` file, preferably in your template folder with your other templates.
+You can create custom templates for your notes by creating a `audiopen-template.md` file (name it anything you want), preferably in your template folder with your other templates.
 
 ### 1. Choose a starting point for your template:
 
