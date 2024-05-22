@@ -27,8 +27,26 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 3. Generate a login token and install it into the audiopen-obsidian plugin settings in Obsidian
 4. Add the webhook url to AudioPen
 
+For detailed instructions, read on:
+
+### 4. How to add the webhook to AudioPen
+
+After you did 1-3 above, you'll have a webhook url and a token.
+
+The webhook URL looks like this: `https://europe-west1-audiopen-obsidian.cloudfunctions.net/webhook/ab97f2f036a143f5d3555e5fc3f4e833`
+
+1. Navigate to [AudioPen](https://audiopen.ai/?aff=x0g97)
+2. Make sure you're logged in
+3. Click the settings icon at the top right of the screen:
+   ![find settings icon](/shared/assets/1-open-settings.png)
+4. Scroll down to the section `Beta Program` and enable the toggle
+5. Right above in the `Integrations` section, click `Set up integrations`
+   ![enable beta, setup integrations](/shared/assets/2-beta-webhooks.png)
+6. add your webhook url
+
 - as an automatic webhook
 - (optionally) as a manual trigger, if you want to be able to update notes
+  ![webhok options](/shared/assets/3-webhook-settings.png)
 
 ## Custom Templates
 
@@ -39,7 +57,7 @@ You can create custom templates for your notes by creating a `audiopen-template.
 - [Template with AudioPen tags as Obsidian Links](plugin/templates/template-links.md?plain=1)
 - [Template with AudioPen tags as Obsidian tags](plugin/templates/template-tags.md?plain=1)
 
-### 2. Save it to your Vault's template folder
+### 2. Save it to your vault's template folder
 
 ### 3. Edit it to your liking
 
@@ -62,7 +80,7 @@ You can use the following variables in your template:
 >   - "[[Link two]]"
 > ```
 >
-> They currently don't handle empty states for you, that's why I suggest always having one tag or one link in the templte before you insert `{tagsAsLinks}` or `{tagsAsTags}`. As you can see in the example templates, I added a tag `#audio-pen` and a link to the current daily note using `{date_formatted}`.
+> They currently don't handle empty states for you, that's why I suggest always having one tag or one link in the template before you insert `{tagsAsLinks}` or `{tagsAsTags}`. As you can see in the example templates, I added a tag `#audio-pen` and a link to the current daily note using `{date_formatted}`. Otherwise if you don't add any tags in AudioPen, and the template only contains `{tagsAsLinks}` or `{tagsAsTags}`, the template YAML properties won't be valid.
 
 ### 4. Add the template to the plugin settings
 
