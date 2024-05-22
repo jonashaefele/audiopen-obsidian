@@ -68,8 +68,6 @@ export class AudioPenSettingTab extends PluginSettingTab {
 
     this.plugin.loadSettings()
 
-    console.log('settings in panel', this.plugin.settings)
-
     let { containerEl } = this
 
     containerEl.empty()
