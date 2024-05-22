@@ -41,9 +41,7 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R5R7K2D7N)
 
-or become a Github Sponsor:
+or become a [Github Sponsor](https://github.com/sponsors/jonashaefele)
 
-<iframe src="https://github.com/sponsors/jonashaefele/button" title="Sponsor jonashaefele" height="32" width="114" style="border: 0; border-radius: 6px;"></iframe>
-
-And while your at it, you might be interested in some of the other things I think about and create.
+And while you're at it, you might be interested in some of the other things I think about and create.
 You can find my work [slow.works](https://slow.works) oand read about my thoughts on [Substack](https://slowworks.substack.com/)
