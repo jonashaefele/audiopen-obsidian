@@ -119,7 +119,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       item.setTitle('Settings').onClick(() => {
         const setting = (this.app as any).setting
         setting.open()
-        setting.openTabById('audiopen-obsidian')
+        setting.openTabById('audiopen-sync')
       })
     )
 
