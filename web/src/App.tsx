@@ -2,7 +2,7 @@ import { onCleanup, onMount, Show, useContext } from 'solid-js'
 import { getDatabase, onValue, ref } from 'firebase/database'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import { AppContext, createAppStore } from './store'
-import app from 'shared/firebase'
+import app from '@shared/firebase'
 import {
   Auth,
   getAuth,
@@ -11,7 +11,7 @@ import {
   signOut,
   User,
 } from '@firebase/auth'
-import { BufferItem } from 'shared/types'
+import { BufferItem } from '@shared/types'
 
 const Login = () => {
   const [store, { setLoading }] = useContext(AppContext)

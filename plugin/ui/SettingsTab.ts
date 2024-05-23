@@ -16,7 +16,7 @@ import {
   signOut,
   Unsubscribe,
 } from 'firebase/auth'
-import { NewLineType } from 'shared/types'
+import { NewLineType } from '@shared/types'
 
 export interface MyPluginSettings {
   token: string

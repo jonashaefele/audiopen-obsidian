@@ -1,11 +1,9 @@
 {
-  "references": [
-    { "path": "./functions" },
-    { "path": "./plugin" },
-    { "path": "./shared" },
-    { "path": "./web" }
-  ],
-  "files": [],
-  "include": [],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
+  },
   "exclude": ["**/node_modules"]
 }

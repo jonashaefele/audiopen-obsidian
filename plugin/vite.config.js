@@ -30,4 +30,9 @@ module.exports = defineConfig({
       },
     },
   ],
+  resolve: {
+    alias: {
+      '@shared': path.resolve(__dirname, '../shared'),
+    },
+  },
 })

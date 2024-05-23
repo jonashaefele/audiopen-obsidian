@@ -5,7 +5,7 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import * as crypto from 'crypto'
 
-import type { BufferItem } from 'shared/types'
+import { BufferItem } from '@shared/types'
 
 admin.initializeApp()
 

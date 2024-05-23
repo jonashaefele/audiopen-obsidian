@@ -2,7 +2,7 @@ import { FirebaseApp } from 'firebase/app'
 import { User } from 'firebase/auth'
 import { createContext } from 'solid-js'
 import { createStore } from 'solid-js/store'
-import { BufferItem } from 'shared/types'
+import { BufferItem } from '@shared/types'
 
 export type Store = {
   app?: FirebaseApp

@@ -16,11 +16,11 @@ import {
   ref,
 } from 'firebase/database'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { default as firebaseApp } from 'shared/firebase'
+import { default as firebaseApp } from '@shared/firebase'
 import moment from 'moment'
 import linksTemplate from './templates/template-links.md'
 import tagsTemplate from './templates/template-tags.md'
-import { BufferItemData, NewLineType } from 'shared/types'
+import { BufferItemData, NewLineType } from '@shared/types'
 
 import {
   MyPluginSettings,
@@ -128,6 +128,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
 
       await promiseChain
       await this.wipe(payloads[payloads.length - 1]) // Wipe the last (newest) payload
+      // TODO: Should this be the last? Or the last touched, which is the first?
       promiseChain.catch((err) => {
         this.handleError(err, 'Error processing webhook events')
       })

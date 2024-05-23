@@ -1,7 +1,12 @@
-import { defineConfig } from "vite";
-import solidPlugin from "vite-plugin-solid";
+import { defineConfig } from 'vite'
+import solidPlugin from 'vite-plugin-solid'
+import { resolve } from 'path'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [solidPlugin()],
-});
+  resolve: {
+    alias: {
+      '@shared': resolve(__dirname, '../shared'),
+    },
+  },
+})
