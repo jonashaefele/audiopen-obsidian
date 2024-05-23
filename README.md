@@ -4,23 +4,6 @@
 
 This is based on the amazing work [trashhalo](https://github.com/trashhalo) did with [obsidian-webhooks](https://github.com/trashhalo/obsidian-webhooks), but updated and extended to work with AudioPen.
 
-## ToDo
-
-- [x] test-deploy to firebase
-- [x] change buffer to save audiopen payload
-- [x] update plugin to create MD from audiopen JSON
-- [x] update plugin to create/update (update if audiopenID matches title only for security purposes)
-- [x] map tags to notes (link to notes)
-- [x] add toggle audiopen tags to notes or tags
-- [x] set folder in plugin settings
-- [x] add template functionality
-- [x] update docs
-- [x] update landing page
-- [ ] publish plugin
-- [ ] submit plugin for release
-- [x] update wipe and buffer functionality on website
-- [x] nice status bar icon and menu
-
 ## Setting up the plugin
 
 1. Install the obsidian plugin from releases (https://github.com/jonashaefele/audiopen-obsidian/releases)
