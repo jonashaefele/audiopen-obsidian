@@ -277,7 +277,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
           })
       }
 
-      containerEl.createEl('h2', { text: 'Danger Zone' })
+      containerEl.createEl('h2', { text: 'Danger zone' })
       new Setting(containerEl)
         .setName(`Reset all settings to defaults.`)
         .addButton(
