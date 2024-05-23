@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 394 396" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-10065,-12033.8)">
-        <g id="Icon-2023" serif:id="Icon 2023" transform="matrix(2,0,0,2,10065,12033.8)">
+<svg width="100%" height="100%" viewBox="0 0 394 394" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Icon-2023" serif:id="Icon 2023" transform="matrix(2,0,0,2,0,-1)">
+        <g>
             <rect x="0" y="0" width="197" height="198" style="fill:none;"/>
             <g transform="matrix(0.973586,-0.581366,0.581366,0.973586,-795.975,98.361)">
                 <g id="Layer-1" serif:id="Layer 1">
@@ -19,7 +19,7 @@
         </g>
     </g>
     <defs>
-        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(86.6841,-117.923,-117.923,-86.6841,1310.66,7378.18)"><stop offset="0" style="stop-color:rgb(41,80,220);stop-opacity:0.15"/><stop offset="1" style="stop-color:rgb(22,38,141);stop-opacity:0.3"/></linearGradient>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(86.6841,-117.923,117.923,86.6841,1310.66,7378.18)"><stop offset="0" style="stop-color:rgb(41,80,220);stop-opacity:0.15"/><stop offset="1" style="stop-color:rgb(22,38,141);stop-opacity:0.3"/></linearGradient>
         <linearGradient id="_Linear2" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(-62.466,83.2305,-83.2305,-62.466,1392.1,7271.21)"><stop offset="0" style="stop-color:rgb(41,80,220);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(22,38,141);stop-opacity:1"/></linearGradient>
     </defs>
 </svg>

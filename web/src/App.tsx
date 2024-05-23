@@ -104,7 +104,7 @@ const Authed = () => {
   return (
     <>
       <section>
-        <div class="flex flex-col md:flex-row md:justify-between items-center bg-neutral-shade px-8 py-4 rounded-3xl my-8">
+        <div class="flex flex-col md:flex-row md:justify-between items-center bg-neutral-shade px-8 py-4 rounded-3xl my-8 gap-4">
           <p>
             You're signed in as{' '}
             <strong>{store.currentUser?.displayName}</strong> (
@@ -120,7 +120,7 @@ const Authed = () => {
         </div>
 
         <div class="flex flex-col bg-neutral p-4 rounded-3xl my-8">
-          <div class="flex flex-col md:flex-row md:justify-between items-center p-4 pt-0 rounded-3xl">
+          <div class="flex flex-col md:flex-row md:justify-between md:items-center px-4 pb-4 rounded-3xl gap-4">
             <div>
               <h3>Obsidian login token</h3>
               {!store.obsidianToken && (
@@ -138,7 +138,7 @@ const Authed = () => {
             )}
           </div>
           {store.obsidianToken && (
-            <div class="p-4 pt-0">
+            <div class="px-4 pb-4">
               <p>
                 Copy token and paste into the{' '}
                 <strong>AudioPen-Obsidian Sync</strong> plugin settings:
@@ -154,9 +154,9 @@ const Authed = () => {
         </div>
       </section>
       {store.key && (
-        <div class="flex flex-col bg-neutral p-8 pt-4 rounded-3xl my-8">
+        <div class="flex flex-col bg-neutral p-8 pt-4 rounded-3xl my-8 gap-4">
           <h3> Webhook URL </h3>
-          <div class="mb-4">
+          <div>
             <ul>
               <li>Use this URL as your AudioPen webhook.</li>
               <li>
@@ -254,7 +254,7 @@ function App() {
 
   return (
     <>
-      <main class="container bg-white rounded-3xl p-12 my-8">
+      <main class="container bg-white shadow rounded-3xl p-4 md:p-12 my-8">
         <section>
           <hgroup>
             <h1> AudioPen-Obsidian Webhook </h1>
@@ -297,20 +297,16 @@ function App() {
               offer it for free as long as I can. Any help in covering server
               costs and continued development is appreciated, but not expected.
             </p>
-            <div class="my-4 flex flex-row items-center">
+            <div class="my-4 flex flex-col md:flex-row items-center gap-4">
               <span>If this tool is helpful to you, you can</span>
-              <a
-                href="https://ko-fi.com/jonashaefele"
-                target="_blank"
-                class="ml-2"
-              >
+              <a href="https://ko-fi.com/jonashaefele" target="_blank">
                 <img
                   class="h-9 border-0"
                   src="https://cdn.ko-fi.com/cdn/kofi1.png?v=3"
                   alt="Buy Me a Coffee at ko-fi.com"
                 />
               </a>
-              <span class="inline-block mx-4">or sponsor me on GitHub</span>
+              <span class="inline-block">or sponsor me on GitHub</span>
               <iframe
                 src="https://github.com/sponsors/jonashaefele/button"
                 title="Sponsor jonashaefele"
@@ -333,6 +329,17 @@ function App() {
           </article>
         </section>
       </main>
+      <footer class="container p-4 md:p-8 my-8 text-center text-primary flex flex-col items-center gap-4">
+        <p>
+          Made with 💙 in London by{' '}
+          <a href="https://www.instagram.com/jonashaefele/" target="_blank">
+            Jonas Haefele
+          </a>
+        </p>
+        <a href="https://slow.works">
+          <img src="/src/favicon.svg" width={40} height={40} />
+        </a>
+      </footer>
     </>
   )
 }

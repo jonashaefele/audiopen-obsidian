@@ -87,7 +87,6 @@ export const wipe = onCall<WipeData>({ cors: true }, async ({ auth, data }) => {
           return buffer
         }
         // eslint-disable-next-line
-        console.log('wiping', data)
         if (typeof buffer == 'object' && data.id !== undefined) {
           return (
             Object.entries(buffer)
