@@ -73,7 +73,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
     containerEl.empty()
 
     // General Settings - Header
-    containerEl.createEl('h2', { text: 'Settings for AudioPen-Obsidian' })
+    containerEl.createEl('h2', { text: 'AudioPen-Obsidian' })
 
     if (this.plugin.settings.error) {
       containerEl.createEl('p', {
@@ -345,7 +345,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
 
     containerEl.createEl('h2', { text: 'Support' })
     containerEl.createEl('p', {
-      text: 'If you like this plugin and get value form it, consider donating to support continued development and to help cover server costs.',
+      text: 'If you like this plugin and get value from it, consider donating to support continued development and to help cover server costs.',
     })
     const donateKoFi = new Setting(this.containerEl)
       .setName('Buy me a Coffee')

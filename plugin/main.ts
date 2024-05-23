@@ -101,17 +101,26 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       item.setIsLabel(true).setTitle(`Status: ${syncStatus}`)
     })
 
+    menu.addSeparator()
+
     menu.addItem((item) =>
       item.setTitle('Force Sync').setIcon('sync').onClick(this.forceBufferSync)
     )
 
     menu.addItem((item) =>
-      item
-        .setTitle('Open Buffer')
-        .setIcon('cloud')
-        .onClick(() => {
-          window.open('https://audiopen-obsidian.web.app', '_blank')
-        })
+      item.setTitle('Open Buffer').onClick(() => {
+        window.open('https://audiopen-obsidian.web.app', '_blank')
+      })
+    )
+
+    menu.addSeparator()
+
+    menu.addItem((item) =>
+      item.setTitle('Settings').onClick(() => {
+        const setting = (this.app as any).setting
+        setting.open()
+        setting.openTabById('audiopen-obsidian')
+      })
     )
 
     menu.showAtMouseEvent(event)
