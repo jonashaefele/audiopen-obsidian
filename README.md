@@ -14,11 +14,12 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 - [x] add toggle audiopen tags to notes or tags
 - [x] set folder in plugin settings
 - [x] add template functionality
-- [ ] update docs
-- [ ] update landing page
+- [x] update docs
+- [x] update landing page
 - [ ] publish plugin
 - [ ] submit plugin for release
-- [ ] update wipe and buffer functionality on website
+- [x] update wipe and buffer functionality on website
+- [x] nice status bar icon and menu
 
 ## Setting up the plugin
 

@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 import {
   Notice,
+  Menu,
   Plugin,
   TFile,
+  setIcon,
   // addIcon,
 } from 'obsidian'
 import { getAuth, Unsubscribe } from 'firebase/auth'
@@ -36,6 +38,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
   valUnsubscribe: Unsubscribe
   statusBarIcon: null | HTMLElement = null // Initialize as null
   defaultTemplate: string
+  syncStatus = 'offline'
 
   async onload() {
     await this.loadSettings()
@@ -47,6 +50,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       if (user) {
         const db = getDatabase(this.firebase)
         const buffer = ref(db, `buffer/${user.uid}`)
+        this.syncStatus = 'ok'
         this.valUnsubscribe = onValue(buffer, async (data) => {
           try {
             await goOffline(db)
@@ -62,34 +66,71 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     const settingTab = new AudioPenSettingTab(this.app, this)
     this.addSettingTab(settingTab)
 
-    // TODO: make official AudioPen Icon work with Obsisian UI rules
-    // addIcon(
-    //   'audiopen-icon',
-    //   `<g transform="matrix(1,0,0,1,0.149662,-0.218721)">
-    //       <g transform="matrix(0.215448,0,0,0.215448,-9.04204,-9.49718)">
-    //           <path d="M83.409,58.085C91.695,47.132 102.464,46.968 110.443,58.276C111.22,61.24 111.655,63.609 112.006,66.376C111.979,67.856 112.034,68.937 112.016,70.466C111.992,73.935 112.04,76.957 112.005,80.441C111.967,85.935 112.012,90.967 111.96,96.317C111.869,97.076 111.874,97.517 111.665,98.224C107.985,106.858 101.861,110.541 93.931,109.024C87.662,107.824 84.437,103.375 82.159,97.626C82.112,96.865 82.028,96.433 82.017,95.604C82.032,94.135 81.973,93.064 81.975,91.747C81.995,91.337 81.955,91.174 81.997,90.548C82.023,84.385 81.967,78.685 81.984,72.617C82.008,71.507 81.959,70.764 81.993,69.606C82.021,67.788 81.966,66.385 81.986,64.594C82.511,62.166 82.96,60.126 83.409,58.085Z" style="fill:currentColor;fill-rule:nonzero;"/>
-    //       </g>
-    //       <g transform="matrix(0.215448,0,0,0.215448,-9.04204,-9.49718)">
-    //           <path d="M63.154,104.932C63.133,103.867 63.112,102.802 62.985,101.011C62.62,99.664 62.36,99.042 62.101,98.419C62.279,97.168 62.457,95.916 62.691,94.267C65.798,94.267 68.835,94.267 72.302,94.731C72.882,96.475 73.033,97.754 73.163,99.34C73.397,100.196 73.65,100.745 73.866,101.48C73.827,101.665 74.015,101.994 73.982,102.358C78.875,113.589 87.318,119.314 97.831,118.914C108.258,118.517 116.336,112.348 120.079,101.829C120.173,101.666 120.096,101.297 120.29,101.058C120.595,100.226 120.705,99.633 120.936,98.67C121.125,97.009 121.193,95.717 121.261,94.426C124.576,94.448 127.89,94.471 131.466,95.072C131.765,96.116 131.804,96.58 131.843,97.043C131.736,97.44 131.629,97.837 131.421,98.773C131.265,99.877 131.21,100.441 131.155,101.005C131.052,101.441 130.949,101.876 130.681,102.947C127.733,113.414 121.41,120.419 112.511,125.745C108.871,126.928 105.604,128.031 102.248,129.164C102.248,133.755 102.248,138.347 102.135,143.253C101.688,144.381 101.354,145.195 101.019,146.009C99.734,147.809 98.45,149.609 96.918,151.756C95.24,149.118 93.786,146.831 92.138,143.811C91.945,140.598 91.722,138.094 91.994,135.644C92.515,130.966 90.85,128.524 86.051,127.289C78.396,125.318 72.651,120.29 68.286,113.789C66.388,110.963 64.853,107.892 63.154,104.932Z" style="fill:currentColor;fill-rule:nonzero;"/>
-    //       </g>
-    //   </g>`
-    // )
-
     this.statusBarIcon = this.addStatusBarItem()
-    this.updateStatusBarIcon('ok') // Set initial color to gray
+    this.updateStatusBarIcon() // Set initial color to gray
+    this.registerDomEvent(this.statusBarIcon, 'click', (event) =>
+      this.showStatusBarMenu(event)
+    )
   }
 
-  updateStatusBarIcon(status: 'ok' | 'sync' | 'error') {
-    this.statusBarIcon.empty()
-    const icon = this.statusBarIcon.createEl('span')
-    icon.addClass('mic')
-
-    switch (status) {
+  getSyncStatus = () => {
+    let syncStatus = 'Starting up'
+    switch (this.syncStatus) {
       case 'ok':
-        icon.style.color = 'var(--text-muted)'
+        syncStatus = 'Fully Synced'
         break
       case 'sync':
-        icon.style.color = 'var(--text-accent)'
+        syncStatus = 'Syncing...'
+        break
+      case 'error':
+        syncStatus = 'Error'
+        break
+      case 'offline':
+      default:
+        syncStatus = 'Offline'
+        break
+    }
+    return syncStatus
+  }
+
+  showStatusBarMenu = (event: MouseEvent) => {
+    const menu = new Menu()
+
+    menu.addItem((item) => {
+      const syncStatus = this.getSyncStatus()
+      item.setIsLabel(true).setTitle(`Status: ${syncStatus}`)
+    })
+
+    menu.addItem((item) =>
+      item.setTitle('Force Sync').setIcon('sync').onClick(this.forceBufferSync)
+    )
+
+    menu.addItem((item) =>
+      item
+        .setTitle('Open Buffer')
+        .setIcon('cloud')
+        .onClick(() => {
+          window.open('https://audiopen-obsidian.web.app', '_blank')
+        })
+    )
+
+    menu.showAtMouseEvent(event)
+  }
+
+  updateStatusBarIcon = () => {
+    this.statusBarIcon.empty()
+    const icon = this.statusBarIcon.createEl('span')
+    setIcon(icon, 'microphone-filled')
+    const syncStatus = this.getSyncStatus()
+    icon.setAttr('data-tooltip-position', 'top')
+    icon.setAttr('aria-label', syncStatus)
+
+    switch (this.syncStatus) {
+      case 'ok':
+        icon.style.color = 'var(--text-success)'
+        break
+      case 'sync':
+        icon.style.color = 'rgba(255,92,10,1)'
         break
       case 'error':
         icon.style.color = 'var(--text-error)'
@@ -97,14 +138,30 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     }
   }
 
-  async onBufferChange(data: DataSnapshot) {
+  forceBufferSync = async () => {
+    const user = getAuth(this.firebase).currentUser
+    if (!user) {
+      return
+    }
+    const db = getDatabase(this.firebase)
+    try {
+      await goOffline(db)
+    } finally {
+      await goOnline(db)
+      new Notice('Reset AudioPen buffer connection')
+    }
+  }
+
+  onBufferChange = async (data: DataSnapshot) => {
     if (!data.hasChildren()) {
-      this.updateStatusBarIcon('ok') // No pending events, set color to gray
+      this.syncStatus = 'ok'
+      this.updateStatusBarIcon() // No pending events, set color to gray
       return
     }
 
     try {
-      this.updateStatusBarIcon('sync') // Pending events, set color to orange
+      this.syncStatus = 'sync'
+      this.updateStatusBarIcon() // Pending events, set color to orange
 
       const payloads: BufferItemData[] = []
       data.forEach((event) => {
@@ -132,23 +189,25 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       promiseChain.catch((err) => {
         this.handleError(err, 'Error processing webhook events')
       })
-
-      this.updateStatusBarIcon('ok') // All events processed, set color to gray
+      this.syncStatus = 'ok'
+      this.updateStatusBarIcon() // All events processed, set color to gray
       new Notice('notes updated by webhooks')
     } catch (err) {
+      this.syncStatus = 'error'
+      this.updateStatusBarIcon()
       this.handleError(err, 'Error processing webhook events')
       throw err
     } finally {
     }
   }
 
-  async wipe(value: unknown) {
+  wipe = async (value: unknown) => {
     const functions = getFunctions(this.firebase, 'europe-west1')
     const wipe = httpsCallable(functions, 'wipe')
     await wipe(value)
   }
 
-  async findFileByAudioPenID(id: string): Promise<TFile | null> {
+  findFileByAudioPenID = async (id: string): Promise<TFile | null> => {
     const files = this.app.vault.getMarkdownFiles()
 
     for (const file of files) {
@@ -165,14 +224,14 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     return null
   }
 
-  async generateMarkdownContent(
+  generateMarkdownContent = async (
     body: string,
     orig_transcript: string,
     title: string,
     tags: string[],
     id: string,
     date_created: string
-  ): Promise<string> {
+  ): Promise<string> => {
     let markdownTemplate: string
     if (!this.settings.useCustomTemplate) {
       // default templates
@@ -237,7 +296,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       .replace(/{tagsAsTags}/g, tagsAsTags)
   }
 
-  async applyEvent({
+  applyEvent = async ({
     body = '',
     orig_transcript = '',
     title = '',
@@ -251,7 +310,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     tags: string[]
     id: string
     date_created: string
-  }) {
+  }) => {
     const existingFiles = this.app.vault.getMarkdownFiles().filter((file) => {
       const frontmatter = this.app.metadataCache.getCache(
         file.path
@@ -324,7 +383,8 @@ export default class ObsidianAudioPenPlugin extends Plugin {
   private handleError(error: Error, message: string) {
     console.error(`${message}: ${error.message}`)
     new Notice(`Error: ${message}`)
-    this.updateStatusBarIcon('error')
+    this.syncStatus = 'error'
+    this.updateStatusBarIcon()
   }
 
   generateFilePath(title: string): string {
@@ -334,7 +394,6 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     const fileName = title
       .replace(/[\\/:*?'"<>.|]/g, '') // Remove reserved characters for file names
       .slice(0, 250) // Limit the file name to 250 characters
-    console.log(`${folderPath}/${fileName}.md`)
     return `${folderPath}/${fileName}.md`
   }
 

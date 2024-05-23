@@ -6,5 +6,9 @@
   "description": "Plugin that connects your notes to AudioPen through webhooks!",
   "author": "Jonas Haefele",
   "authorUrl": "https://audiopen-obsidian.web.app",
-  "isDesktopOnly": false
+  "isDesktopOnly": false,
+  "fundingUrl": {
+    "Buy Me a Coffee": "https://ko-fi.com/jonashaefele",
+    "GitHub Sponsor": "https://github.com/sponsors/jonashaefele"
+  }
 }

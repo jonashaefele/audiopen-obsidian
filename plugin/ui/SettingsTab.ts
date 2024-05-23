@@ -313,7 +313,6 @@ export class AudioPenSettingTab extends PluginSettingTab {
           .setPlaceholder('Paste your token')
           .setValue(this.plugin.settings.token)
           .onChange(async (value) => {
-            console.log('Secret: ' + value)
             this.plugin.settings.token = value
             await this.plugin.saveSettings()
           })
