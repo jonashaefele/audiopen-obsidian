@@ -77,7 +77,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     let syncStatus = 'Starting up'
     switch (this.syncStatus) {
       case 'ok':
-        syncStatus = 'Fully Synced'
+        syncStatus = 'Fully synced'
         break
       case 'sync':
         syncStatus = 'Syncing...'
@@ -104,11 +104,11 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     menu.addSeparator()
 
     menu.addItem((item) =>
-      item.setTitle('Force Sync').setIcon('sync').onClick(this.forceBufferSync)
+      item.setTitle('Force sync').setIcon('sync').onClick(this.forceBufferSync)
     )
 
     menu.addItem((item) =>
-      item.setTitle('Open Buffer').onClick(() => {
+      item.setTitle('Open buffer').onClick(() => {
         window.open('https://audiopen-obsidian.web.app', '_blank')
       })
     )
