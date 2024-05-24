@@ -1,4 +1,5 @@
 import { onCleanup, onMount, Show, useContext } from 'solid-js'
+import type { JSX } from 'solid-js'
 import { useToast } from './utils'
 import { getDatabase, onValue, ref } from 'firebase/database'
 import { getFunctions, httpsCallable } from 'firebase/functions'
@@ -61,10 +62,10 @@ const Authed = () => {
   const { showToast, toastMessage, toastPosition, showToastMessage } =
     useToast()
 
-  const handleCopy = (e: FocusEvent<HTMLInputElement>) => {
-    e.target.select()
-    navigator.clipboard.writeText(e.target.value)
-    showToastMessage('Copied to clipboard', e.target)
+  const handleCopy: JSX.EventHandler<HTMLInputElement, FocusEvent> = (e) => {
+    e.currentTarget.select()
+    navigator.clipboard.writeText(e.currentTarget.value)
+    showToastMessage('Copied to clipboard', e.currentTarget)
   }
 
   const handleGenerateClick = async () => {
