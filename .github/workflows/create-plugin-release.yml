@@ -16,10 +16,13 @@ jobs:
         with:
           node-version: '18.x' # You might need to adjust this value to your own version
       # Get the version number and put it in a variable
+      - name: Fetch tags
+        run: git fetch --tags
+
       - name: Get Version
         id: version
         run: |
-          echo "::set-output name=tag::$(git describe --abbrev=0)"
+          echo "::set-output name=tag::$(git rev-parse --short HEAD)"
       # Build the plugin
       - name: Run install
         uses: borales/actions-yarn@v4
