@@ -16,10 +16,11 @@ jobs:
         with:
           node-version: '18.x' # You might need to adjust this value to your own version
       # Get the version number and put it in a variable
-      - name: Get Version
-        id: version
+      - name: Get package version
+        id: package-version
         run: |
-          echo "::set-output name=tag::$(git rev-parse --short HEAD)"
+          VERSION=$(jq -r '.version' manifest.json)
+          echo "::set-output name=version::$VERSION"
       # Build the plugin
       - name: Run install
         uses: borales/actions-yarn@v4
@@ -56,7 +57,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./${{ github.event.repository.name }}.zip
-          asset_name: ${{ github.event.repository.name }}-${{ steps.version.outputs.tag }}.zip
+          asset_name: ${{ github.event.repository.name }}-${{ steps.package-version.outputs.version }}.zip
           asset_content_type: application/zip
       # Upload the main.js
       - name: Upload main.js
