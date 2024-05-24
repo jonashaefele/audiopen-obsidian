@@ -18,7 +18,7 @@ import {
 } from 'firebase/auth'
 import { NewLineType } from '@shared/types'
 
-export interface MyPluginSettings {
+export interface AudioPenSyncSettings {
   token: string
   frequency: string
   triggerOnLoad: boolean
@@ -32,7 +32,7 @@ export interface MyPluginSettings {
   useCustomTemplate: boolean
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
+export const DEFAULT_SETTINGS: AudioPenSyncSettings = {
   token: '',
   frequency: '0', // manual by default
   triggerOnLoad: true,

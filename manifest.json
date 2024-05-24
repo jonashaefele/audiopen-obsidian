@@ -1,7 +1,7 @@
 {
   "id": "audiopen-sync",
   "name": "AudioPen Sync",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "minAppVersion": "1.6.0",
   "description": "Plugin and service that syncs new AudioPen notes to Obsidian.",
   "author": "Jonas Haefele",

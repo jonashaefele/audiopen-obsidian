@@ -25,13 +25,13 @@ import tagsTemplate from './templates/template-tags.md'
 import { BufferItemData, NewLineType } from '@shared/types'
 
 import {
-  MyPluginSettings,
+  AudioPenSyncSettings,
   DEFAULT_SETTINGS,
   AudioPenSettingTab,
 } from './ui/SettingsTab'
 
 export default class ObsidianAudioPenPlugin extends Plugin {
-  settings: MyPluginSettings
+  settings: AudioPenSyncSettings
   firebase: FirebaseApp
   loggedIn: boolean
   authUnsubscribe: Unsubscribe
@@ -133,18 +133,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     const syncStatus = this.getSyncStatus()
     icon.setAttr('data-tooltip-position', 'top')
     icon.setAttr('aria-label', syncStatus)
-
-    switch (this.syncStatus) {
-      case 'ok':
-        icon.style.color = 'var(--text-success)'
-        break
-      case 'sync':
-        icon.style.color = 'rgba(255,92,10,1)'
-        break
-      case 'error':
-        icon.style.color = 'var(--text-error)'
-        break
-    }
+    icon.addClass(`mod-${this.syncStatus}`)
   }
 
   forceBufferSync = async () => {

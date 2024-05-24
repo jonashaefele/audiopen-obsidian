@@ -1,0 +1,11 @@
+.mod-ok {
+  color: var(--text-success);
+}
+
+.mod-sync {
+  color: rgba(255, 92, 10, 1);
+}
+
+.mod-error {
+  color: var(--text-error);
+}
