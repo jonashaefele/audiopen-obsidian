@@ -337,7 +337,7 @@ function App() {
           </a>
         </p>
         <a href="https://slow.works">
-          <img src="/src/favicon.svg" width={40} height={40} />
+          <img src="/favicon.svg" width={40} height={40} />
         </a>
       </footer>
     </>
