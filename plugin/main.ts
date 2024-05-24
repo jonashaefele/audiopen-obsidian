@@ -117,7 +117,9 @@ export default class ObsidianAudioPenPlugin extends Plugin {
 
     menu.addItem((item) =>
       item.setTitle('Settings').onClick(() => {
-        const setting = (this.app as any).setting
+        // this.app.setting is not defined in types, but exists
+        // @ts-ignore
+        const setting = this.app.setting
         setting.open()
         setting.openTabById('audiopen-sync')
       })
@@ -185,15 +187,15 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       await this.wipe(payloads[payloads.length - 1]) // Wipe the last (newest) payload
       // TODO: Should this be the last? Or the last touched, which is the first?
       promiseChain.catch((err) => {
-        this.handleError(err, 'Error processing webhook events')
+        this.handleError(err, 'Error loading AudioPen notes')
       })
       this.syncStatus = 'ok'
       this.updateStatusBarIcon() // All events processed, set color to gray
-      new Notice('notes updated by webhooks')
+      new Notice('New AudioPen notes loaded')
     } catch (err) {
       this.syncStatus = 'error'
       this.updateStatusBarIcon()
-      this.handleError(err, 'Error processing webhook events')
+      this.handleError(err, 'Error loading AudioPen notes')
       throw err
     } finally {
     }
@@ -249,12 +251,17 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       }
     }
 
+    // get link to daily note, read from periodic notes if installed
+    // then fall back to daily note core plugin
+    // then fall back to basic YYYY-MM-DD
+
+    // this.app.plugins is not defined in types, but exists
     // @ts-ignore
     const periodicNotesPlugin = this.app.plugins.getPlugin('periodic-notes')
     // @ts-ignore
     const dailyNotesPlugin = this.app.plugins.getPlugin('daily-notes')
 
-    let dailyNoteFormat = 'YYYY-MM-DD-dddd'
+    let dailyNoteFormat = 'YYYY-MM-DD'
 
     if (periodicNotesPlugin && periodicNotesPlugin.settings) {
       dailyNoteFormat =
@@ -287,7 +294,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       .replace(/{date_created}/g, date_created)
       .replace(
         /{date_formatted}/g,
-        moment(new Date(date_created)).format('YYYY-MM-DD-dddd')
+        moment(new Date(date_created)).format(dailyNoteFormat)
       )
       .replace(/{linkProperty}/g, this.settings.linkProperty || 'x')
       .replace(/{tagsAsLinks}/g, tagsAsLinks)
