@@ -1,4 +1,5 @@
 import { onCleanup, onMount, Show, useContext } from 'solid-js'
+import { useToast } from './utils'
 import { getDatabase, onValue, ref } from 'firebase/database'
 import { getFunctions, httpsCallable } from 'firebase/functions'
 import { AppContext, createAppStore } from './store'
@@ -56,6 +57,15 @@ const Authed = () => {
 
     onCleanup(() => unsubscribe())
   })
+
+  const { showToast, toastMessage, toastPosition, showToastMessage } =
+    useToast()
+
+  const handleCopy = (e: FocusEvent<HTMLInputElement>) => {
+    e.target.select()
+    navigator.clipboard.writeText(e.target.value)
+    showToastMessage('Copied to clipboard', e.target)
+  }
 
   const handleGenerateClick = async () => {
     setLoading(true)
@@ -148,6 +158,7 @@ const Authed = () => {
                 class="form-input w-full"
                 readOnly={true}
                 value={store.obsidianToken}
+                onFocus={handleCopy}
               />
             </div>
           )}
@@ -176,6 +187,7 @@ const Authed = () => {
             readOnly={true}
             class="form-input"
             value={`https://europe-west1-audiopen-obsidian.cloudfunctions.net/webhook/${store.key}`}
+            onFocus={handleCopy}
           />
         </div>
       )}
@@ -217,6 +229,18 @@ const Authed = () => {
           ))}
         </div>
       )}
+      <Show when={showToast()}>
+        <div
+          class="bg-secondary-focus text-secondary-content px-4 py-1 rounded-lg -mt-8 -translate-x-1/2 shadow-lg"
+          style={{
+            position: 'fixed',
+            left: `${toastPosition()?.x || 0}px`,
+            top: `${toastPosition()?.y || 0}px`,
+          }}
+        >
+          {toastMessage()}
+        </div>
+      </Show>
     </>
   )
 }
