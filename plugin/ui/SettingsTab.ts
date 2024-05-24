@@ -73,7 +73,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
     containerEl.empty()
 
     // General Settings - Header
-    containerEl.createEl('h2', { text: 'AudioPen-Obsidian' })
+    containerEl.createEl('h2', { text: 'AudioPen Sync' })
 
     if (this.plugin.settings.error) {
       containerEl.createEl('p', {
