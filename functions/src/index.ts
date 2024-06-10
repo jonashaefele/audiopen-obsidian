@@ -53,13 +53,27 @@ export const webhook = onRequest({ cors: true }, async (request, response) => {
       body,
       orig_transcript,
       tags:
-        typeof tags === 'string' // tags can be undefined
+        typeof tags === 'string'
           ? tags.split(',').map((tag) => tag.trim())
           : [],
       date_created,
     },
   }
-  await admin.database().ref(`/buffer/${user}`).push(buffer)
+
+  // check if note is already in buffer
+  const db = admin.database()
+  const bufferRef = db.ref(`/buffer/${user}`)
+  const snapshot = await bufferRef
+    .orderByChild('data/id')
+    .equalTo(id)
+    .once('value')
+  // update if exists, else push
+  if (snapshot.exists()) {
+    const itemKey = Object.keys(snapshot.val())[0]
+    await bufferRef.child(itemKey).set(buffer)
+  } else {
+    await bufferRef.push(buffer)
+  }
   response.send('ok')
 })
 

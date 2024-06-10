@@ -171,20 +171,23 @@ export default class ObsidianAudioPenPlugin extends Plugin {
         }
       })
 
-      // Sort payloads by date_created in ascending order
-      payloads.sort((a, b) => {
-        const dateA = new Date(a.date_created)
-        const dateB = new Date(b.date_created)
-        return dateA.getTime() - dateB.getTime()
-      })
+      // filter unique payloads, if we have the updates of the same note in the buffer
+      // obsidian cache doesn't update fast enough, so we need to only save the latest version.
+      const uniquePayloads = payloads.filter(
+        (payload, index, self) =>
+          index === self.findLastIndex((p) => p.id === payload.id)
+      )
 
+      // Create or update notes, then delete form buffer
       let promiseChain = Promise.resolve()
-      for (const payload of payloads) {
-        promiseChain = promiseChain.then(() => this.applyEvent(payload))
+      for (const payload of uniquePayloads) {
+        promiseChain = promiseChain.then(async () => {
+          await this.applyEvent(payload)
+          await this.wipe(payload)
+        })
       }
 
       await promiseChain
-      await this.wipe(payloads[payloads.length - 1]) // Wipe the last (newest) payload
       // TODO: Should this be the last? Or the last touched, which is the first?
       promiseChain.catch((err) => {
         this.handleError(err, 'Error loading AudioPen notes')
