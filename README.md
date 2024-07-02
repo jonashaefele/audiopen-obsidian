@@ -6,7 +6,7 @@ This is based on the amazing work [trashhalo](https://github.com/trashhalo) did 
 
 ## Setting up the plugin
 
-1. Install the obsidian plugin from releases (https://github.com/jonashaefele/audiopen-obsidian/releases)
+1. Install the obsidian plugin from the [community plugins](https://obsidian.md/plugins?search=audiopen-sync)
 2. Go to https://audiopen-obsidian.web.app to signup for the service
 3. Generate a login token
 4. Used the token to log in the `Audiopen-Obsidian Sync` plugin settings in Obsidian
@@ -82,8 +82,4 @@ If you sign up to [AudioPen](https://audiopen.ai/?aff=x0g97) with a link from th
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R5R7K2D7N) or become a [Github Sponsor](https://github.com/sponsors/jonashaefele)
 
 And while you're at it, you might be interested in some of the other things I think about and create.
-You can find my work [slow.works](https://slow.works) oand read about my thoughts on [Substack](https://slowworks.substack.com/)
-
-```
-
-```
+You can find my work [slow.works](https://slow.works) and read about my thoughts on [Substack](https://slowworks.substack.com/)
