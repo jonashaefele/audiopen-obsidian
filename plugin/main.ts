@@ -42,6 +42,7 @@ export default class ObsidianAudioPenPlugin extends Plugin {
 
   async onload() {
     await this.loadSettings()
+    console.log('Loaded AudioPen plugin, debug:', this.settings.debug)
     this.firebase = firebaseApp
     this.authUnsubscribe = getAuth(this.firebase).onAuthStateChanged((user) => {
       if (this.valUnsubscribe) {
@@ -171,6 +172,8 @@ export default class ObsidianAudioPenPlugin extends Plugin {
         }
       })
 
+      if (this.settings.debug) console.log('AudioPen payloads', payloads)
+
       // filter unique payloads, if we have the updates of the same note in the buffer
       // obsidian cache doesn't update fast enough, so we need to only save the latest version.
       const uniquePayloads = payloads.filter(
@@ -178,10 +181,14 @@ export default class ObsidianAudioPenPlugin extends Plugin {
           index === self.findLastIndex((p) => p.id === payload.id)
       )
 
+      if (this.settings.debug)
+        console.log('AudioPen unique payloads', uniquePayloads)
+
       // Create or update notes, then delete form buffer
       let promiseChain = Promise.resolve()
       for (const payload of uniquePayloads) {
         promiseChain = promiseChain.then(async () => {
+          if (this.settings.debug) console.log('Syncing audiopen note', payload)
           await this.applyEvent(payload)
           await this.wipe(payload)
         })
@@ -319,12 +326,16 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     id: string
     date_created: string
   }) => {
-    const existingFiles = this.app.vault.getMarkdownFiles().filter((file) => {
-      const frontmatter = this.app.metadataCache.getCache(
-        file.path
-      )?.frontmatter
-      return frontmatter && frontmatter.audioPenID === id
-    })
+    // audiopen changed it's date format, so we need to parse it
+    const parsedDate = moment(date_created, 'DD/MM/YYYY').format()
+
+    if (this.settings.debug)
+      console.log(
+        'Audiopen created date:',
+        date_created,
+        'parsedDate for Obsidian:',
+        parsedDate
+      )
 
     let newContent = await this.generateMarkdownContent(
       body,
@@ -332,13 +343,33 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       title,
       tags,
       id,
-      date_created
+      parsedDate
     )
+
+    const existingFiles = this.app.vault.getMarkdownFiles().filter((file) => {
+      const frontmatter = this.app.metadataCache.getCache(
+        file.path
+      )?.frontmatter
+      return (
+        frontmatter && frontmatter.audioPenID?.toString() === id?.toString()
+      )
+    })
+
+    if (this.settings.debug)
+      console.log('Existing files:', existingFiles, 'audioPenID:', id)
 
     if (existingFiles.length === 0) {
       // No existing file found, create a new file
-      const filePath = this.generateFilePath(title)
-      await this.app.vault.create(filePath, newContent)
+      let filePath = this.generateFilePath(title)
+      try {
+        await this.app.vault.create(filePath, newContent)
+      } catch (error) {
+        console.error('Error creating new note, adding date to filename', error)
+        filePath = this.generateFilePath(
+          `${title}-${moment(parsedDate).format('YYYY-MM-DD')}`
+        )
+        await this.app.vault.create(filePath, newContent)
+      }
       return
     }
 

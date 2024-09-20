@@ -7,7 +7,7 @@ aliases:
 tags: 
   - audio-pen
 {tagsAsTags}
-audioPenID: {id}
+audioPenID: "{id}"
 ---
 
 # {title}

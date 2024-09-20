@@ -1,7 +1,7 @@
 {
   "id": "audiopen-sync",
   "name": "AudioPen Sync",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "minAppVersion": "1.6.0",
   "description": "Sync notes from AudioPen.",
   "author": "Jonas Haefele",

@@ -19,6 +19,7 @@ import {
 import { NewLineType } from '@shared/types'
 
 export interface AudioPenSyncSettings {
+  debug: boolean
   token: string
   frequency: string
   triggerOnLoad: boolean
@@ -43,6 +44,7 @@ export const DEFAULT_SETTINGS: AudioPenSyncSettings = {
   folderPath: '',
   updateMode: 'new',
   useCustomTemplate: false,
+  debug: false,
 }
 
 export class AudioPenSettingTab extends PluginSettingTab {
@@ -273,6 +275,21 @@ export class AudioPenSettingTab extends PluginSettingTab {
             inputEl.value = this.plugin.settings.markdownTemplate || ''
           })
       }
+
+      new Setting(containerEl)
+        .setName('Debug Mode')
+        .setDesc(
+          'Print debug messages to the console. This is useful for troubleshooting issues. See the console with View --> Toggle Developer Tools'
+        )
+        .addToggle((toggle) =>
+          toggle
+            .setValue(this.plugin.settings.debug)
+            .onChange(async (value) => {
+              this.plugin.settings.debug = value
+              await this.plugin.saveSettings()
+              this.display()
+            })
+        )
 
       new Setting(containerEl).setName('Danger zone').setHeading()
       new Setting(containerEl)
