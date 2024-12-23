@@ -18,11 +18,11 @@ import {
   ref,
 } from 'firebase/database'
 import { getFunctions, httpsCallable } from 'firebase/functions'
-import { default as firebaseApp } from '@shared/firebase'
+import { default as firebaseApp } from '../shared/firebase'
 import moment from 'moment'
 import linksTemplate from './templates/template-links.md'
 import tagsTemplate from './templates/template-tags.md'
-import { BufferItemData, NewLineType } from '@shared/types'
+import { BufferItemData, NewLineType } from '../shared/types'
 
 import {
   AudioPenSyncSettings,
@@ -172,7 +172,8 @@ export default class ObsidianAudioPenPlugin extends Plugin {
         }
       })
 
-      if (this.settings.debug) console.log('AudioPen payloads', payloads)
+      if (this.settings.debug)
+        console.log('AudioPen/Voicenotes payloads', payloads)
 
       // filter unique payloads, if we have the updates of the same note in the buffer
       // obsidian cache doesn't update fast enough, so we need to only save the latest version.
@@ -182,13 +183,16 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       )
 
       if (this.settings.debug)
-        console.log('AudioPen unique payloads', uniquePayloads)
+        console.log('AudioPen/Voicenotes unique payloads', uniquePayloads)
 
       // Create or update notes, then delete form buffer
       let promiseChain = Promise.resolve()
       for (const payload of uniquePayloads) {
         promiseChain = promiseChain.then(async () => {
-          if (this.settings.debug) console.log('Syncing audiopen note', payload)
+          payload.platform =
+            payload.orig_transcript !== undefined ? 'audiopen' : 'voicenotes'
+          if (this.settings.debug)
+            console.log(`Syncing ${payload.platform} note`, payload)
           await this.applyEvent(payload)
           await this.wipe(payload)
         })
@@ -197,15 +201,15 @@ export default class ObsidianAudioPenPlugin extends Plugin {
       await promiseChain
       // TODO: Should this be the last? Or the last touched, which is the first?
       promiseChain.catch((err) => {
-        this.handleError(err, 'Error loading AudioPen notes')
+        this.handleError(err, 'Error loading AudioPen/Voicenotes notes')
       })
       this.syncStatus = 'ok'
       this.updateStatusBarIcon() // All events processed, set color to gray
-      new Notice('New AudioPen notes loaded')
+      new Notice('New AudioPen/Voicenotes notes loaded')
     } catch (err) {
       this.syncStatus = 'error'
       this.updateStatusBarIcon()
-      this.handleError(err, 'Error loading AudioPen notes')
+      this.handleError(err, 'Error loading AudioPen/Voicenotes notes')
       throw err
     } finally {
     }
@@ -234,100 +238,22 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     return null
   }
 
-  generateMarkdownContent = async (
-    body: string,
-    orig_transcript: string,
-    title: string,
-    tags: string[],
-    id: string,
-    date_created: string
-  ): Promise<string> => {
-    let markdownTemplate: string
-    if (!this.settings.useCustomTemplate) {
-      // default templates
-      if (this.settings.tagsAsLinks) {
-        markdownTemplate = linksTemplate
-      } else {
-        markdownTemplate = tagsTemplate
-      }
-    } else {
-      const file = this.app.vault.getAbstractFileByPath(
-        this.settings.markdownTemplate
-      )
-      if (file instanceof TFile) {
-        markdownTemplate = await this.app.vault.cachedRead(file)
-      } else {
-        throw new Error('Invalid file type for markdown template')
-      }
-    }
-
-    // get link to daily note, read from periodic notes if installed
-    // then fall back to daily note core plugin
-    // then fall back to basic YYYY-MM-DD
-
-    // this.app.plugins is not defined in types, but exists
-    // @ts-ignore
-    const periodicNotesPlugin = this.app.plugins.getPlugin('periodic-notes')
-    // @ts-ignore
-    const dailyNotesPlugin = this.app.plugins.getPlugin('daily-notes')
-
-    let dailyNoteFormat = 'YYYY-MM-DD'
-
-    if (periodicNotesPlugin && periodicNotesPlugin.settings) {
-      dailyNoteFormat =
-        periodicNotesPlugin.settings.daily?.format || dailyNoteFormat
-    } else if (dailyNotesPlugin && dailyNotesPlugin.settings) {
-      dailyNoteFormat = dailyNotesPlugin.settings.format || dailyNoteFormat
-    }
-
-    const tagsAsLinks =
-      this.settings.tagsAsLinks && tags?.length > 0
-        ? tags
-            .map((tag) => (tag?.length > 0 ? `  - "[[${tag.trim()}]]"` : null))
-            .filter((t) => !!t)
-            .join('\n')
-        : ''
-
-    const tagsAsTags =
-      !this.settings.tagsAsLinks && tags?.length > 0
-        ? tags
-            .map((tag) => (tag?.length > 0 ? `  - ${tag.trim()}` : null))
-            .filter((t) => !!t)
-            .join('\n')
-        : ''
-
-    return markdownTemplate
-      .replace(/{title}/g, title)
-      .replace(/{body}/g, body)
-      .replace(/{orig_transcript}/g, orig_transcript)
-      .replace(/{id}/g, id)
-      .replace(/{date_created}/g, date_created)
-      .replace(
-        /{date_formatted}/g,
-        moment(new Date(date_created)).format(dailyNoteFormat)
-      )
-      .replace(/{linkProperty}/g, this.settings.linkProperty || 'x')
-      .replace(/{tagsAsLinks}/g, tagsAsLinks)
-      .replace(/{tagsAsTags}/g, tagsAsTags)
-  }
-
   applyEvent = async ({
     body = '',
-    orig_transcript = '',
+    transcript = '', // TODO: only have body OR transcript
+    orig_transcript,
     title = '',
     tags = [],
     id = '',
     date_created = '',
-  }: {
-    body: string
-    orig_transcript: string
-    title: string
-    tags: string[]
-    id: string
-    date_created: string
-  }) => {
+    timestamp = '',
+    platform = 'audiopen',
+  }: BufferItemData) => {
     // audiopen changed it's date format, so we need to parse it
-    const parsedDate = moment(date_created, 'DD/MM/YYYY').format()
+    const parsedDate =
+      platform === 'audiopen'
+        ? moment(date_created, 'DD/MM/YYYY').format() //audiopen
+        : timestamp // voicenotes
 
     if (this.settings.debug)
       console.log(
@@ -337,14 +263,16 @@ export default class ObsidianAudioPenPlugin extends Plugin {
         parsedDate
       )
 
-    let newContent = await this.generateMarkdownContent(
+    let newContent = await this.generateMarkdownContent({
       body,
+      transcript: transcript.replace(/\<br\/\>/g, '\n'), // voienotes uses  <br> instead of new line
       orig_transcript,
       title,
       tags,
       id,
-      parsedDate
-    )
+      platform,
+      timestamp: parsedDate,
+    })
 
     const existingFiles = this.app.vault.getMarkdownFiles().filter((file) => {
       const frontmatter = this.app.metadataCache.getCache(
@@ -408,11 +336,98 @@ export default class ObsidianAudioPenPlugin extends Plugin {
     await this.app.vault.modify(existingFiles[0], updatedContent)
   }
 
+  generateMarkdownContent = async ({
+    body,
+    transcript,
+    orig_transcript,
+    title,
+    tags,
+    id,
+    timestamp,
+    platform,
+  }: BufferItemData): Promise<string> => {
+    let markdownTemplate: string
+    if (!this.settings.useCustomTemplate) {
+      // default templates
+      if (this.settings.tagsAsLinks) {
+        markdownTemplate = linksTemplate
+      } else {
+        markdownTemplate = tagsTemplate
+      }
+    } else {
+      const file = this.app.vault.getAbstractFileByPath(
+        this.settings.markdownTemplate
+      )
+      if (file instanceof TFile) {
+        markdownTemplate = await this.app.vault.cachedRead(file)
+      } else {
+        throw new Error('Invalid file type for markdown template')
+      }
+    }
+
+    // get link to daily note, read from periodic notes if installed
+    // then fall back to daily note core plugin
+    // then fall back to basic YYYY-MM-DD
+
+    // this.app.plugins is not defined in types, but exists
+    // @ts-ignore
+    const periodicNotesPlugin = this.app.plugins.getPlugin('periodic-notes')
+    // @ts-ignore
+    const dailyNotesPlugin = this.app.plugins.getPlugin('daily-notes')
+
+    let dailyNoteFormat = 'YYYY-MM-DD'
+
+    if (periodicNotesPlugin && periodicNotesPlugin.settings) {
+      dailyNoteFormat =
+        periodicNotesPlugin.settings.daily?.format || dailyNoteFormat
+    } else if (dailyNotesPlugin && dailyNotesPlugin.settings) {
+      dailyNoteFormat = dailyNotesPlugin.settings.format || dailyNoteFormat
+    }
+
+    const tagsAsLinks =
+      this.settings.tagsAsLinks && tags?.length > 0
+        ? tags
+            .map((tag) => (tag?.length > 0 ? `  - "[[${tag.trim()}]]"` : null))
+            .filter((t) => !!t)
+            .join('\n')
+        : ''
+
+    const tagsAsTags =
+      !this.settings.tagsAsLinks && tags?.length > 0
+        ? tags
+            .map((tag) => (tag?.length > 0 ? `  - ${tag.trim()}` : null))
+            .filter((t) => !!t)
+            .join('\n')
+        : ''
+
+    console.log(body, orig_transcript, title, tags, id, timestamp)
+
+    return markdownTemplate
+      .replace(/{title}/g, title)
+      .replace(/{body}/g, platform === 'audiopen' ? body : transcript)
+      .replace(
+        /{orig_transcript}/g,
+        platform === 'audiopen'
+          ? orig_transcript || body
+          : transcript.replace(/\n/g, ' ')
+      )
+      .replace(/{id}/g, id)
+      .replace(/{date_created}/g, timestamp)
+      .replace(
+        /{date_formatted}/g,
+        moment(new Date(timestamp)).format(dailyNoteFormat)
+      )
+      .replace(/{linkProperty}/g, this.settings.linkProperty || 'x')
+      .replace(/{tagsAsLinks}/g, tagsAsLinks)
+      .replace(/{tagsAsTags}/g, tagsAsTags)
+      .replace(/{platform}/g, platform)
+  }
+
   getNewLine(): string {
     switch (this.settings.newLineType) {
-      case NewLineType.Windows:
+      case 'windows':
         return '\r\n'
-      case NewLineType.UnixMac:
+      case 'unixMac':
         return '\n'
       default:
         return ''

@@ -16,7 +16,7 @@ import {
   signOut,
   Unsubscribe,
 } from 'firebase/auth'
-import { NewLineType } from '@shared/types'
+import { NewLineType } from '../../shared/types'
 
 export interface AudioPenSyncSettings {
   debug: boolean
@@ -137,7 +137,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
       new Setting(containerEl)
         .setName('Update mode')
         .setDesc(
-          'How to handle existing files when receiving updates to an existing AudioPen note (identified by AudioPen ID). Append and prepend will only insert the new/edited summary.'
+          'How to handle existing files when receiving updates to an existing AudioPen/Voicenotes note (identified by AudioPenID). Append and prepend will only insert the new/edited summary.'
         )
         .addDropdown((dropdown) => {
           dropdown
@@ -166,18 +166,18 @@ export class AudioPenSettingTab extends PluginSettingTab {
           const { newLineType } = this.plugin.settings
           if (newLineType === undefined) {
             dropdown.setValue('none')
-          } else if (newLineType == NewLineType.Windows) {
+          } else if (newLineType == 'windows') {
             dropdown.setValue('windows')
-          } else if (newLineType == NewLineType.UnixMac) {
+          } else if (newLineType == 'unixMac') {
             dropdown.setValue('unixMac')
           }
           dropdown.onChange(async (value) => {
             if (value == 'none') {
               this.plugin.settings.newLineType = undefined
             } else if (value == 'windows') {
-              this.plugin.settings.newLineType = NewLineType.Windows
+              this.plugin.settings.newLineType = 'windows'
             } else if (value == 'unixMac') {
-              this.plugin.settings.newLineType = NewLineType.UnixMac
+              this.plugin.settings.newLineType = 'unixMac'
             }
             await this.plugin.saveSettings()
             this.display()
@@ -241,7 +241,7 @@ export class AudioPenSettingTab extends PluginSettingTab {
 
       if (this.plugin.settings.useCustomTemplate) {
         containerEl.createEl('p', {
-          text: 'You can use the following variables in your template: {title}, {body}, {orig_transcript}, {id}, {date_created},{date_formatted}, {tagsAsLinks}, {tagsAsTags}',
+          text: 'You can use the following variables in your template: {title}, {body}, {orig_transcript}, {id}, {date_created},{date_formatted}, {tagsAsLinks}, {tagsAsTags}, {platform}',
         })
         containerEl.createEl('a', {
           text: 'Check the README for more information',

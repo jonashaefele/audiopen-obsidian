@@ -135,7 +135,7 @@ const Authed = () => {
             <div>
               <h3>Obsidian login token</h3>
               {!store.obsidianToken && (
-                <p>First, let's get a login token from Obsidian</p>
+                <p>First, let's get a login token for Obsidian</p>
               )}
             </div>
             {!store.obsidianToken && (
@@ -170,7 +170,7 @@ const Authed = () => {
           <h3> Webhook URL </h3>
           <div>
             <ul>
-              <li>Use this URL as your AudioPen webhook.</li>
+              <li>Use this URL as your AudioPen or Voicenotes.com webhook.</li>
               <li>
                 Step by step instructions are in the{' '}
                 <a
@@ -199,7 +199,7 @@ const Authed = () => {
               <h3>You have notes waiting in your buffer</h3>
               <p>
                 If things are not syncing, try clearing the buffer. This won't
-                delete anything from AudioPen.
+                delete anything from AudioPen/Voicenotes.
               </p>
             </div>
             <button
@@ -282,7 +282,7 @@ function App() {
       <main class="container bg-white shadow rounded-3xl p-4 md:p-12 my-8">
         <section>
           <hgroup>
-            <h1> AudioPen-Obsidian Webhook </h1>
+            <h1> AudioPen/Voicenotes Sync for Obsidian</h1>
             <h2>
               Connect{' '}
               <a
@@ -291,6 +291,14 @@ function App() {
                 class="text-[rgb(255,92,10)] underline"
               >
                 AudioPen
+              </a>
+              {' or '}
+              <a
+                href="https://voicenotes.com/?via=jonas"
+                target="_blank"
+                class="text-[#1b1c1c] underline"
+              >
+                Voicenotes
               </a>{' '}
               to{' '}
               <a

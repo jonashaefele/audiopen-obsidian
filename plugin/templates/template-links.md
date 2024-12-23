@@ -6,7 +6,7 @@ up: "[[AudioPen]]"
 {tagsAsLinks}
 aliases:
 tags: 
-  - audio-pen
+  - {platform}
 audioPenID: "{id}"
 ---
 

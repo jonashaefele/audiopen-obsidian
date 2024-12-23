@@ -1,9 +1,9 @@
 {
   "id": "audiopen-sync",
   "name": "AudioPen Sync",
-  "version": "0.1.13",
+  "version": "0.2.0",
   "minAppVersion": "1.6.0",
-  "description": "Sync notes from AudioPen.",
+  "description": "Sync notes from AudioPen or VoiceNotes.",
   "author": "Jonas Haefele",
   "authorUrl": "https://audiopen-obsidian.web.app",
   "isDesktopOnly": false,

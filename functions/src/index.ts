@@ -27,15 +27,45 @@ export const webhook = onRequest({ cors: true }, async (request, response) => {
     today.getDate() + 7
   )
 
-  const { id, title, body, orig_transcript, tags, date_created } = request.body
-
+  let buffer: BufferItem
   // Validate the required fields and their types
   if (
-    typeof id !== 'string' ||
-    typeof title !== 'string' ||
-    typeof body !== 'string' ||
-    typeof orig_transcript !== 'string'
+    typeof request.body.data?.id === 'string' &&
+    typeof request.body.data?.title === 'string' &&
+    typeof request.body.data?.transcript === 'string'
   ) {
+    // voicenotes
+    buffer = { ...request.body }
+    buffer.data.platform = 'voicenotes'
+    buffer.data.timestamp = request.body.timestamp || new Date().toISOString()
+
+    if (!buffer.id) buffer.id = request.body.data.id
+  } else if (
+    typeof request.body.id === 'string' ||
+    typeof request.body.title === 'string' ||
+    typeof request.body.body === 'string' ||
+    typeof request.body.orig_transcript === 'string'
+  ) {
+    // audiopen
+    const { id, title, body, orig_transcript, tags, date_created } =
+      request.body
+    buffer = {
+      id: id,
+      exp,
+      data: {
+        platform: 'audiopen',
+        id,
+        title,
+        body,
+        orig_transcript,
+        tags:
+          typeof tags === 'string'
+            ? tags.split(',').map((tag) => tag.trim())
+            : [],
+        date_created,
+      },
+    }
+  } else {
     response
       .status(400)
       .send(
@@ -44,28 +74,12 @@ export const webhook = onRequest({ cors: true }, async (request, response) => {
     return
   }
 
-  const buffer: BufferItem = {
-    id: id,
-    exp,
-    data: {
-      id,
-      title,
-      body,
-      orig_transcript,
-      tags:
-        typeof tags === 'string'
-          ? tags.split(',').map((tag) => tag.trim())
-          : [],
-      date_created,
-    },
-  }
-
   // check if note is already in buffer
   const db = admin.database()
   const bufferRef = db.ref(`/buffer/${user}`)
   const snapshot = await bufferRef
     .orderByChild('data/id')
-    .equalTo(id)
+    .equalTo(buffer.id)
     .once('value')
   // update if exists, else push
   if (snapshot.exists()) {

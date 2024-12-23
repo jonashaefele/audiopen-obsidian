@@ -5,7 +5,7 @@ up: "[[AudioPen]]"
   - "[[{date_formatted}]]"
 aliases:
 tags: 
-  - audio-pen
+  - {platform}
 {tagsAsTags}
 audioPenID: "{id}"
 ---

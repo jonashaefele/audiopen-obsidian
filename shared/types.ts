@@ -2,9 +2,12 @@ export interface BufferItemData {
   id: string
   title: string
   body: string
-  orig_transcript: string
+  transcript?: string
+  orig_transcript?: string
   tags: string[]
-  date_created: string
+  date_created?: string
+  timestamp?: string
+  platform: 'voicenotes' | 'audiopen'
 }
 
 export interface BufferItem {
@@ -13,8 +16,4 @@ export interface BufferItem {
   data: BufferItemData
 }
 
-// eslint-disable-next-line no-shadow
-export enum NewLineType {
-  Windows = 1,
-  UnixMac = 2,
-}
+export type NewLineType = 'windows' | 'unixMac' | undefined
